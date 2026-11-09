@@ -7,14 +7,17 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 VER=$(node -p "require('./extension/manifest.json').version")
+command -v zip >/dev/null || { echo 'Не найдена утилита zip: установите её перед сборкой.' >&2; exit 1; }
 
-for f in src/vxp-*.js; do node --check "$f"; done
+for f in src/vxp-{bg,fx,room,denoise.src}.js scripts/build-main.js; do node --check "$f"; done
 
 rm -rf dist build && mkdir -p dist build/chrome build/firefox
 for d in chrome firefox; do
   cp -rp extension/icons extension/popup.html extension/popup.js build/$d/
   cp README.md build/$d/README.md
-  for f in main bg fx room; do cp -p "src/vxp-$f.js" "build/$d/vxp-$f.js"; done
+  node scripts/build-main.js "build/$d/vxp-main.js"
+  node --check "build/$d/vxp-main.js"
+  for f in bg fx room; do cp -p "src/vxp-$f.js" "build/$d/vxp-$f.js"; done
   node scripts/embed-models.js "build/$d/vxp-denoise.js"
   node --check "build/$d/vxp-denoise.js"
 done
