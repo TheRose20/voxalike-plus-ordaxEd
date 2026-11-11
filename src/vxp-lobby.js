@@ -12,6 +12,70 @@
     let currentRoom = window.__VXP__ && window.__VXP__.room && window.__VXP__.room.state;
     let renderQueued = false;
 
+    const SETTINGS_KEY = 'vxp-lobby:settings:v1';
+    function loadSettings() {
+      try {
+        const raw = localStorage.getItem(SETTINGS_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (err) {
+        console.warn('[Voxalike+OrdaxEd] lobby settings load', err);
+        return {};
+      }
+    }
+    function saveSettings(settings) {
+      try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+      } catch (err) {
+        console.warn('[Voxalike+OrdaxEd] lobby settings save', err);
+      }
+    }
+    function restoreSettings() {
+      const settings = loadSettings();
+      if (!settings || typeof settings !== 'object') return;
+      const selectors = [
+        { key: 'pvpEnabled', selector: '#joined-room-pvp-enabled', type: 'checkbox' },
+        { key: 'playerLimit', selector: '#joined-room-player-limit', type: 'select' },
+        { key: 'coopAssignment', selector: '#joined-room-coop-assignment', type: 'select' },
+        { key: 'allowReRecords', selector: '#joined-room-allow-re-records', type: 'checkbox' },
+      ];
+      for (const { key, selector, type } of selectors) {
+        if (settings[key] == null) continue;
+        const element = document.querySelector(selector);
+        if (!element) continue;
+        if (type === 'checkbox' && element.checked !== settings[key]) {
+          element.checked = settings[key];
+          element.dispatchEvent(new Event('change', { bubbles: true }));
+        } else if (type === 'select' && element.value !== String(settings[key])) {
+          element.value = String(settings[key]);
+          element.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+    }
+    function captureSettings() {
+      const settings = {};
+      const selectors = [
+        { key: 'pvpEnabled', selector: '#joined-room-pvp-enabled', type: 'checkbox' },
+        { key: 'playerLimit', selector: '#joined-room-player-limit', type: 'select' },
+        { key: 'coopAssignment', selector: '#joined-room-coop-assignment', type: 'select' },
+        { key: 'allowReRecords', selector: '#joined-room-allow-re-records', type: 'checkbox' },
+      ];
+      for (const { key, selector, type } of selectors) {
+        const element = document.querySelector(selector);
+        if (!element) continue;
+        settings[key] = type === 'checkbox' ? element.checked : element.value;
+      }
+      saveSettings(settings);
+    }
+    function installSettingsCapture() {
+      const selectors = ['#joined-room-pvp-enabled', '#joined-room-player-limit', '#joined-room-coop-assignment', '#joined-room-allow-re-records'];
+      for (const selector of selectors) {
+        const element = document.querySelector(selector);
+        if (!element || element._vxpSettingsCapture) continue;
+        element._vxpSettingsCapture = true;
+        element.addEventListener('change', captureSettings);
+      }
+    }
+
     const text = (value) => String(value == null ? '' : value);
     const plural = (n, one, few, many) => {
       const d = Math.abs(Number(n) || 0) % 100, last = d % 10;
@@ -295,6 +359,7 @@
       const room = currentRoom || (window.__VXP__ && window.__VXP__.room && window.__VXP__.room.state);
       const pack = room && room.status === 'lobby' && room.lobbyPack;
       installPackPicker();
+      installSettingsCapture();
       for (const old of qsa('.vxp-lobby-info')) old.remove();
       if (!pack) return;
       const hosts = qsa('.selected-pack-card');
@@ -336,7 +401,13 @@
       return response;
     };
 
-    onBus('room', (room) => { currentRoom = room; scheduleRender(); });
+    onBus('room', (room) => {
+      currentRoom = room;
+      if (room && room.status === 'lobby') {
+        setTimeout(restoreSettings, 100);
+      }
+      scheduleRender();
+    });
     const observer = new MutationObserver((records) => {
       for (const record of records) {
         const ownTarget = record.target.nodeType === 1 && record.target.closest('.vxp-lobby-info');
