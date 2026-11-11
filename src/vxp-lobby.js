@@ -1,16 +1,5 @@
-/*!
- * Voxalike+OrdaxEd — расширенная информация о моде в лобби.
- *
- * Progress:
- * - 2026-11-10: Phase 1 — room-state subscription, Workshop lookup cache,
- *   and current-pack details card.
- * - 2026-11-10: Phase 2 — local project.json extraction from installed ZIP
- *   blobs and per-character line counts.
- * - 2026-11-10: Phase 3 — wide (>=1280px) lobby layout that separates
- *   mod details, native host settings, players, and chat.
- * - 2026-11-10: Phase 4 — host-only pack-picker modal driven by the native
- *   select, with a full-text search and role-count range.
- */
+// Voxalike+OrdaxEd — расширенная информация о моде в лобби.
+
 (() => {
   'use strict';
   const NAME = 'lobby';
