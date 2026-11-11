@@ -366,6 +366,10 @@
     min-height: 0;
     overflow-y: auto;
   }
+  .joined-room-shell .joined-lobby-grid .player-lobby-panel > .room-chat-panel .room-chat-message {
+    user-select: text;
+    -webkit-user-select: text;
+  }
   .joined-room-shell .joined-lobby-grid .player-lobby-panel > .lobby-action-dock { grid-column: 1; grid-row: 2; }
 }
 
