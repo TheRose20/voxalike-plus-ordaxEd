@@ -24,7 +24,7 @@
 (() => {
   'use strict';
   if (window.__VXP__) return;
-  const VERSION = '1.20.0';
+  const VERSION = '1.31.0';
   const VXP = (window.__VXP__ = { version: VERSION });
   const IS_FF = /firefox/i.test(navigator.userAgent);
 
@@ -178,4 +178,3 @@
   const emit = (n, d) => bus.dispatchEvent(new CustomEvent(n, { detail: d }));
   const onBus = (n, f) => bus.addEventListener(n, (e) => f(e.detail));
   onBus('theme', () => { try { panel.editor && panel.editor.draw(); studio && studio.editor && studio.editor.draw(); } catch {} });
-
