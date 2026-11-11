@@ -29,50 +29,66 @@
         console.warn('[Voxalike+OrdaxEd] lobby settings save', err);
       }
     }
-    function restoreSettings() {
-      const settings = loadSettings();
-      if (!settings || typeof settings !== 'object') return;
-      const selectors = [
-        { key: 'pvpEnabled', selector: '#joined-room-pvp-enabled', type: 'checkbox' },
-        { key: 'playerLimit', selector: '#joined-room-player-limit', type: 'select' },
-        { key: 'coopAssignment', selector: '#joined-room-coop-assignment', type: 'select' },
-        { key: 'allowReRecords', selector: '#joined-room-allow-re-records', type: 'checkbox' },
-      ];
-      for (const { key, selector, type } of selectors) {
-        if (settings[key] == null) continue;
-        const element = document.querySelector(selector);
-        if (!element) continue;
-        if (type === 'checkbox' && element.checked !== settings[key]) {
-          element.checked = settings[key];
-          element.dispatchEvent(new Event('change', { bubbles: true }));
-        } else if (type === 'select' && element.value !== String(settings[key])) {
-          element.value = String(settings[key]);
-          element.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-      }
+    // Настройки комнаты (режим, лимит игроков, назначение, re-records).
+    // Селекторы сверены с разметкой снапшота chat/not grid.
+    const roomSettingControls = () => {
+      return {
+        modeButtons: [...qsa('.room-mode-select')],
+        playerLimit: document.querySelector('#room-player-limit'),
+        playerLimitConfirm: document.querySelector('.room-player-limit-confirm'),
+        assignment: document.querySelector('.room-assignment-mode-field select.select-input'),
+        reRecords: document.querySelector('button.claim-mode-switch[aria-label="Enable re-records"]'),
+      };
+    };
+    const nativeSetter = (el, value) => {
+      const proto = el.tagName === 'SELECT' ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
+      Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, value);
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+    function readRoomSettings() {
+      const c = roomSettingControls();
+      const selectedMode = c.modeButtons.find((b) => b.getAttribute('aria-pressed') === 'true');
+      const settings = {};
+      if (selectedMode) settings.mode = selectedMode.textContent.trim();
+      if (c.playerLimit) settings.playerLimit = c.playerLimit.value;
+      if (c.assignment) settings.assignment = c.assignment.value;
+      if (c.reRecords) settings.reRecords = c.reRecords.getAttribute('aria-pressed') === 'true';
+      return settings;
     }
     function captureSettings() {
-      const settings = {};
-      const selectors = [
-        { key: 'pvpEnabled', selector: '#joined-room-pvp-enabled', type: 'checkbox' },
-        { key: 'playerLimit', selector: '#joined-room-player-limit', type: 'select' },
-        { key: 'coopAssignment', selector: '#joined-room-coop-assignment', type: 'select' },
-        { key: 'allowReRecords', selector: '#joined-room-allow-re-records', type: 'checkbox' },
-      ];
-      for (const { key, selector, type } of selectors) {
-        const element = document.querySelector(selector);
-        if (!element) continue;
-        settings[key] = type === 'checkbox' ? element.checked : element.value;
+      const current = readRoomSettings();
+      if (Object.keys(current).length) saveSettings({ ...loadSettings(), ...current });
+    }
+    function applyRoomSettings(settings) {
+      const c = roomSettingControls();
+      if (settings.mode) {
+        const target = c.modeButtons.find((b) => b.textContent.trim() === settings.mode);
+        if (target && target.getAttribute('aria-pressed') !== 'true') target.click();
       }
-      saveSettings(settings);
+      if (settings.assignment && c.assignment && c.assignment.value !== settings.assignment) {
+        nativeSetter(c.assignment, settings.assignment);
+      }
+      if (settings.playerLimit && c.playerLimit && c.playerLimit.value !== String(settings.playerLimit)) {
+        nativeSetter(c.playerLimit, String(settings.playerLimit));
+        if (c.playerLimitConfirm && !c.playerLimitConfirm.disabled) c.playerLimitConfirm.click();
+      }
+      if (typeof settings.reRecords === 'boolean' && c.reRecords && (c.reRecords.getAttribute('aria-pressed') === 'true') !== settings.reRecords) {
+        c.reRecords.click();
+      }
+    }
+    function restoreSettings() {
+      const settings = loadSettings();
+      if (settings && typeof settings === 'object') applyRoomSettings(settings);
     }
     function installSettingsCapture() {
-      const selectors = ['#joined-room-pvp-enabled', '#joined-room-player-limit', '#joined-room-coop-assignment', '#joined-room-allow-re-records'];
-      for (const selector of selectors) {
-        const element = document.querySelector(selector);
-        if (!element || element._vxpSettingsCapture) continue;
-        element._vxpSettingsCapture = true;
-        element.addEventListener('change', captureSettings);
+      const c = roomSettingControls();
+      const targets = [...c.modeButtons, c.playerLimit, c.playerLimitConfirm, c.assignment, c.reRecords].filter(Boolean);
+      for (const el of targets) {
+        if (el._vxpSettingsCapture) continue;
+        el._vxpSettingsCapture = true;
+        el.addEventListener('click', () => setTimeout(captureSettings, 0));
+        el.addEventListener('change', captureSettings);
       }
     }
 
