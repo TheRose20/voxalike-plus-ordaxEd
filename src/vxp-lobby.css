@@ -388,3 +388,41 @@
 @media (max-width: 560px) {
   .vxp-lobby-info { display: block; }
 }
+
+/* Сводка по ролям на экране выбора ролей (vxp-lobby-roles.js) */
+.vxp-roles-panel {
+  min-width: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 10px 12px;
+  border: 1px solid #f7f7ff24;
+  border-radius: 10px;
+  background: #0d161fdb;
+}
+.vxp-roles-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  opacity: .8;
+}
+.vxp-roles-list { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.vxp-roles-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "name count" "roles roles";
+  align-items: baseline;
+  gap: 0 10px;
+  padding: 4px 0;
+  border-top: 1px solid #f7f7ff14;
+}
+.vxp-roles-row:first-child { border-top: 0; }
+.vxp-roles-name { grid-area: name; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.vxp-roles-count { grid-area: count; font-variant-numeric: tabular-nums; font-size: 13px; color: #9ed6ff; }
+.vxp-roles-roles { grid-area: roles; font-size: 11px; opacity: .65; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 680px) {
+  .vxp-roles-panel { max-height: 140px; padding: 8px 10px; }
+  .vxp-roles-roles { display: none; }
+}

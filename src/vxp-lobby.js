@@ -8,7 +8,6 @@
     const { h, tr, qsa, fetch: vxpFetch, onBus } = api;
     const lookupCache = new Map();
     const libraryCache = new Map();
-    const lineCountCache = new Map();
     let currentRoom = window.__VXP__ && window.__VXP__.room && window.__VXP__.room.state;
     let renderQueued = false;
 
@@ -148,89 +147,12 @@
       return pending;
     }
 
-    function idbAllPacks() {
-      return new Promise((resolve, reject) => {
-        const request = indexedDB.open('project-echo-local-packs');
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => {
-          const db = request.result;
-          let transaction;
-          try { transaction = db.transaction('pack-sources', 'readonly'); } catch (err) { db.close(); reject(err); return; }
-          const getAll = transaction.objectStore('pack-sources').getAll();
-          getAll.onerror = () => { db.close(); reject(getAll.error); };
-          getAll.onsuccess = () => { db.close(); resolve(getAll.result || []); };
-        };
-      });
-    }
-    function findLocalPack(records, pack, detail) {
-      const workshopId = text(pack.workshopPackId || (detail && detail.id));
-      const slug = text(pack.workshopPackSlug || (detail && detail.slug));
-      return records.find((record) => {
-        const summary = record && record.summary || {};
-        return (workshopId && summary.workshopId === workshopId) || (slug && summary.workshopSlug === slug);
-      }) || null;
-    }
-    async function readZipEntry(blob, wantedName) {
-      if (!blob || !blob.size) return null;
-      const tailStart = Math.max(0, blob.size - 0x10016);
-      const tail = new Uint8Array(await blob.slice(tailStart).arrayBuffer());
-      let eocd = -1;
-      for (let i = tail.length - 22; i >= 0; i--) {
-        if (tail[i] === 0x50 && tail[i + 1] === 0x4b && tail[i + 2] === 0x05 && tail[i + 3] === 0x06) { eocd = i; break; }
-      }
-      if (eocd < 0) throw new Error('ZIP end record not found');
-      const end = new DataView(tail.buffer, tail.byteOffset + eocd);
-      const directorySize = end.getUint32(12, true), directoryOffset = end.getUint32(16, true);
-      const directory = new Uint8Array(await blob.slice(directoryOffset, directoryOffset + directorySize).arrayBuffer());
-      const decoder = new TextDecoder('utf-8');
-      for (let offset = 0; offset + 46 <= directory.length;) {
-        const view = new DataView(directory.buffer, directory.byteOffset + offset);
-        if (view.getUint32(0, true) !== 0x02014b50) throw new Error('Invalid ZIP central directory');
-        const method = view.getUint16(10, true), compressedSize = view.getUint32(20, true);
-        const nameLength = view.getUint16(28, true), extraLength = view.getUint16(30, true), commentLength = view.getUint16(32, true);
-        const localOffset = view.getUint32(42, true);
-        const name = decoder.decode(directory.slice(offset + 46, offset + 46 + nameLength));
-        offset += 46 + nameLength + extraLength + commentLength;
-        if (name !== wantedName) continue;
-        const header = new Uint8Array(await blob.slice(localOffset, localOffset + 30).arrayBuffer());
-        const local = new DataView(header.buffer, header.byteOffset);
-        if (local.getUint32(0, true) !== 0x04034b50) throw new Error('Invalid ZIP local header');
-        const dataStart = localOffset + 30 + local.getUint16(26, true) + local.getUint16(28, true);
-        const compressed = await blob.slice(dataStart, dataStart + compressedSize).arrayBuffer();
-        if (method === 0) return new Uint8Array(compressed);
-        if (method === 8 && typeof DecompressionStream !== 'undefined') {
-          const stream = new Blob([compressed]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
-          return new Uint8Array(await new Response(stream).arrayBuffer());
-        }
-        throw new Error('Unsupported ZIP compression: ' + method);
-      }
-      return null;
-    }
-    async function loadLineCounts(pack, detail) {
-      const key = text((detail && detail.packageHash) || pack.workshopPackId || pack.workshopPackSlug || pack.packId);
-      if (!key) return null;
-      if (lineCountCache.has(key)) return lineCountCache.get(key);
-      const pending = idbAllPacks().then(async (records) => {
-        const record = findLocalPack(records, pack, detail);
-        const file = record && Array.isArray(record.files) && record.files.find((item) => item && item.blob);
-        if (!file) return null;
-        const bytes = await readZipEntry(file.blob, 'project.json');
-        if (!bytes) return null;
-        const project = JSON.parse(new TextDecoder('utf-8').decode(bytes));
-        const names = new Map((project.characters || []).map((character) => [character.id, character.name]));
-        const counts = {};
-        for (const line of project.lines || []) {
-          const name = names.get(line.characterId);
-          if (name) counts[name] = (counts[name] || 0) + 1;
-        }
-        return counts;
-      }).catch((err) => {
-        console.warn('[Voxalike+OrdaxEd] lobby local pack', err);
-        return null;
-      });
-      lineCountCache.set(key, pending);
-      return pending;
-    }
+    // Общие утилиты лежат в vxp-lobby-shared.js (загружается раньше этого модуля).
+    const shared = () => window.__VXP_LOBBY_SHARED__;
+    const idbAllPacks = () => shared() ? shared().idbAllPacks() : Promise.reject(new Error('lobby-shared missing'));
+    const loadLineCounts = (pack, detail) => shared()
+      ? shared().loadLineCounts(pack, detail).then((counts) => (counts ? counts.byRole : null))
+      : Promise.resolve(null);
 
     function openPreview(url, title) {
       if (!url) return;

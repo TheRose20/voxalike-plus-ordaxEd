@@ -9,7 +9,7 @@ cd "$(dirname "$0")"
 VER=$(node -p "require('./extension/manifest.json').version")
 command -v zip >/dev/null || { echo 'Не найдена утилита zip: установите её перед сборкой.' >&2; exit 1; }
 
-for f in src/vxp-{bg,fx,room,lobby,denoise.src}.js scripts/build-main.js; do node --check "$f"; done
+for f in src/vxp-{bg,fx,room,lobby,lobby-shared,lobby-roles,denoise.src}.js scripts/build-main.js; do node --check "$f"; done
 node --check scripts/make-userscript.js
 [ -f src/vxp-lobby.css ] || { echo 'Не найден src/vxp-lobby.css.' >&2; exit 1; }
 
@@ -19,7 +19,7 @@ for d in chrome firefox; do
   cp README.md build/$d/README.md
   node scripts/build-main.js "build/$d/vxp-main.js"
   node --check "build/$d/vxp-main.js"
-  for f in bg fx room lobby; do cp -p "src/vxp-$f.js" "build/$d/vxp-$f.js"; done
+  for f in bg fx room lobby lobby-shared lobby-roles; do cp -p "src/vxp-$f.js" "build/$d/vxp-$f.js"; done
   cp -p src/vxp-lobby.css "build/$d/vxp-lobby.css"
   node scripts/embed-models.js "build/$d/vxp-denoise.js"
   node --check "build/$d/vxp-denoise.js"
