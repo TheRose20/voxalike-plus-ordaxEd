@@ -254,25 +254,58 @@
     flex-direction: column;
     min-height: 0;
     height: 100%;
-    overflow: hidden;
+    overflow: hidden auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
-  .joined-room-shell .joined-lobby-grid .selected-pack-cover { display: none; }
+  .joined-room-shell .joined-lobby-grid .selected-pack-card::-webkit-scrollbar {
+    display: none;
+  }
   .joined-room-shell .joined-lobby-grid .selected-pack-content { display: contents; }
   .joined-room-shell .joined-lobby-grid .selected-pack-content > span,
   .joined-room-shell .joined-lobby-grid .selected-pack-content > h2,
   .joined-room-shell .joined-lobby-grid .selected-pack-content > .selected-pack-creator,
   .joined-room-shell .joined-lobby-grid .selected-pack-content > .selected-pack-meta,
   .joined-room-shell .joined-lobby-grid .selected-pack-content > .selected-pack-roles { display: none; }
+  .joined-room-shell .joined-lobby-grid .selected-pack-content > .button-row { order: 2; }
+  .joined-room-shell .joined-lobby-grid .vxp-lobby-info { order: 1; }
   .joined-room-shell .joined-lobby-grid .vxp-lobby-info {
     display: block;
-    flex: 1;
+    flex: none;
+    order: 1;
     min-height: 0;
     margin: 0;
-    padding: 14px;
-    overflow: hidden auto;
+    padding: 14px 14px 18px;
+    overflow: visible;
     border-top: 0;
-    border-bottom: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+    border-bottom: 2px solid color-mix(in srgb, currentColor 22%, transparent);
   }
+  .joined-room-shell .joined-lobby-grid .selected-pack-content > .button-row {
+    display: contents;
+  }
+  .joined-room-shell .joined-lobby-grid .selected-pack-content > .button-row > .inline-pack-picker {
+    order: 0;
+    padding: 14px 14px 0;
+  }
+  .joined-room-shell .joined-lobby-grid .selected-pack-content > .button-row > :not(.inline-pack-picker) {
+    order: 2;
+    margin-inline: 14px;
+  }
+  .joined-room-shell .joined-lobby-grid .selected-pack-content > .button-row > .room-mode-picker {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .joined-room-shell .joined-lobby-grid .selected-pack-content > .button-row > .room-mode-picker::before {
+    grid-column: 1 / -1;
+    content: 'Настройки';
+    display: block;
+    margin-bottom: 2px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .joined-room-shell .joined-lobby-grid .room-pack-field-heading { display: none; }
   .joined-room-shell .joined-lobby-grid .vxp-lobby-cover {
     float: none;
     width: 100%;

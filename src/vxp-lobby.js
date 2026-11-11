@@ -271,7 +271,6 @@
       if (slug) card.append(h('a', { class: 'vxp-lobby-link vxp-lobby-workshop-link', href: workshopUrl(slug), target: '_blank', rel: 'noopener' }, tr('Открыть в Workshop ↗', 'Open in Workshop ↗')));
       const body = h('div', { class: 'vxp-lobby-body' });
       body.append(h('div', { class: 'vxp-lobby-heading' },
-        h('span', { class: 'vxp-lobby-kicker' }, tr('ИНФОРМАЦИЯ О МОДЕ', 'MOD INFORMATION')),
         h('h3', null, text(pack.packTitle || (detail && detail.title) || tr('Неизвестный мод', 'Unknown mod'))),
         h('p', { class: 'vxp-lobby-author' }, tr('Автор: ', 'By ') + text(pack.creator || (detail && detail.creator) || '—')),
       ));
