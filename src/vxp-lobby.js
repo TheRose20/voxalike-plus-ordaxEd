@@ -226,7 +226,7 @@
               h('small', null, tr('Размер: ', 'Size: ') + formatSize(data.packageSize)),
               h('small', null, tr('Реплики: ', 'Lines: ') + formatNumber(data.clipCount != null ? data.clipCount : pack.clipCount)),
               h('small', null, (data.ratingAverage == null ? '—' : '★ ' + Number(data.ratingAverage).toFixed(1))),
-              h('small', null, tr('↓: ', '↓: ') + formatNumber(data.downloadCount)),
+              h('small', null, tr('↓ ', '↓ ') + formatNumber(data.downloadCount)),
             ));
           grid.append(card);
         }
