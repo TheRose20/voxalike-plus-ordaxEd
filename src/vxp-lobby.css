@@ -426,3 +426,21 @@
   .vxp-roles-panel { max-height: 140px; padding: 8px 10px; }
   .vxp-roles-roles { display: none; }
 }
+
+/* Аватар роли на нативных карточках выбора ролей (vxp-lobby-roles.js) */
+.role-selection-card { position: relative; }
+.vxp-role-avatar {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  object-fit: cover;
+  pointer-events: none; /* клик остаётся за карточкой: захват/снятие роли не ломается */
+  background: #0d161f;
+  border: 1px solid #f7f7ff24;
+}
+@media (max-width: 680px) {
+  .vxp-role-avatar { width: 26px; height: 26px; top: 6px; right: 6px; border-radius: 6px; }
+}

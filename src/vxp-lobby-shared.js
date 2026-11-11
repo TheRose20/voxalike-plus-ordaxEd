@@ -10,6 +10,7 @@
   const DB_NAME = 'project-echo-local-packs';
   const STORE = 'pack-sources';
   const lineCountCache = new Map();
+  const portraitCache = new Map();
 
   const text = (value) => String(value == null ? '' : value);
 
@@ -109,5 +110,51 @@
     return pending;
   }
 
-  window.__VXP_LOBBY_SHARED__ = { text, idbAllPacks, findLocalPack, readZipEntry, loadLocalProject, loadLineCounts };
+  // MIME по расширению: мод обычно хранит PNG, но портрет может быть пересобран в webp,
+  // поэтому тип берём из имени файла, а не из предположения.
+  const MIME_BY_EXT = {
+    png: 'image/png', webp: 'image/webp', jpg: 'image/jpeg', jpeg: 'image/jpeg',
+    gif: 'image/gif', avif: 'image/avif', bmp: 'image/bmp', svg: 'image/svg+xml',
+  };
+  function mimeFor(name) {
+    const ext = text(name).split('.').pop().toLowerCase();
+    return MIME_BY_EXT[ext] || 'application/octet-stream';
+  }
+
+  // Читает файл портрета из локального архива мода и возвращает Blob с верным MIME.
+  // portraitName берётся из project.json (character.portrait) — формат не предполагается.
+  async function loadPortraits(pack, detail) {
+    const key = text((detail && detail.packageHash) || pack.workshopPackId || pack.workshopPackSlug || pack.packId);
+    if (!key) return null;
+    if (portraitCache.has(key)) return portraitCache.get(key);
+    const pending = loadLocalProject(pack, detail).then(async (project) => {
+      if (!project) return null;
+      const records = await idbAllPacks();
+      const record = findLocalPack(records, pack, detail);
+      const file = record && Array.isArray(record.files) && record.files.find((item) => item && item.blob);
+      if (!file) return null;
+      const out = new Map();
+      for (const character of project.characters || []) {
+        const name = text(character && character.name);
+        const portrait = text(character && character.portrait);
+        if (!name || !portrait) continue;
+        try {
+          const bytes = await readZipEntry(file.blob, portrait);
+          if (bytes) out.set(name, new Blob([bytes], { type: mimeFor(portrait) }));
+        } catch (err) {
+          console.warn('[Voxalike+OrdaxEd] lobby portrait', portrait, err);
+        }
+      }
+      return out.size ? out : null;
+    }).catch((err) => {
+      console.warn('[Voxalike+OrdaxEd] lobby portraits', err);
+      return null;
+    });
+    portraitCache.set(key, pending);
+    return pending;
+  }
+
+  window.__VXP_LOBBY_SHARED__ = {
+    text, idbAllPacks, findLocalPack, readZipEntry, loadLocalProject, loadLineCounts, loadPortraits, mimeFor,
+  };
 })();

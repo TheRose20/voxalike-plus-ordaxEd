@@ -16,6 +16,56 @@
     const shared = () => window.__VXP_LOBBY_SHARED__;
     const text = (value) => String(value == null ? '' : value);
 
+    // Object URL живут до смены мода или выгрузки страницы: перерисовки не должны
+    // плодить новые URL и отзывать те, что ещё висят в DOM.
+    let portraitPackKey = '';
+    let portraitUrls = new Map();
+    function releasePortraits() {
+      for (const url of portraitUrls.values()) URL.revokeObjectURL(url);
+      portraitUrls.clear();
+      portraitPackKey = '';
+    }
+    const packKey = (pack) => text(pack && (pack.workshopPackId || pack.workshopPackSlug || pack.packId));
+    function portraitUrlMap(pack, portraits) {
+      const key = packKey(pack);
+      if (key !== portraitPackKey) { releasePortraits(); portraitPackKey = key; }
+      if (!portraits) return portraitUrls;
+      for (const [role, blob] of portraits) {
+        if (!portraitUrls.has(role)) {
+          try { portraitUrls.set(role, URL.createObjectURL(blob)); } catch (err) { /* Blob невалиден — покажем инициал */ }
+        }
+      }
+      return portraitUrls;
+    }
+    window.addEventListener('pagehide', releasePortraits);
+
+    // Имя роли из карточки: aria-label «Claim Роль» / «Release Роль · Игрок», либо текст <strong>.
+    function cardRoleName(card) {
+      const strong = card.querySelector('strong');
+      if (strong && strong.textContent.trim()) return strong.textContent.trim();
+      const label = text(card.getAttribute('aria-label')).replace(/^(Claim|Release)\s+/i, '');
+      return label.split('·')[0].trim();
+    }
+
+    // Аватары на нативных карточках ролей. Клик по картинке не должен прерывать захват роли:
+    // pointer-events:none ставится в CSS, поэтому здесь только вставка.
+    function installAvatars(urls) {
+      for (const card of qsa('.role-selection-card')) {
+        const role = cardRoleName(card);
+        if (!role) continue;
+        const url = urls.get(role);
+        const existing = card.querySelector('.vxp-role-avatar');
+        if (!url) { if (existing) existing.remove(); continue; }
+        if (existing) {
+          if (existing.getAttribute('src') !== url) existing.setAttribute('src', url);
+          continue;
+        }
+        const img = h('img', { class: 'vxp-role-avatar', src: url, alt: '', 'aria-hidden': 'true' });
+        img.addEventListener('error', () => img.remove());
+        card.prepend(img);
+      }
+    }
+
     // { playerId, name, roles: [роль…], lines: число реплик или null, known: bool }
     function buildPlayerSummary(room, lineCounts) {
       const players = Array.isArray(room.players) ? room.players : [];
@@ -70,6 +120,17 @@
       for (const old of qsa('.vxp-roles-panel')) old.remove();
       const room = currentRoom || (window.__VXP__ && window.__VXP__.room && window.__VXP__.room.state);
       if (!stage() || !room || room.status !== 'lobby') return;
+
+      // Аватары привязаны к карточкам ролей, а не к захватам: показываем их и до выбора.
+      const urls = portraitUrlMap(room.lobbyPack, null);
+      installAvatars(urls);
+      if (shared()) {
+        shared().loadPortraits(room.lobbyPack, null).then((portraits) => {
+          if (!portraits) return;
+          installAvatars(portraitUrlMap(room.lobbyPack, portraits));
+        });
+      }
+
       const claims = Array.isArray(room.roleClaims) ? room.roleClaims : [];
       if (!claims.length) return;
 
