@@ -389,6 +389,49 @@
   .vxp-lobby-info { display: block; }
 }
 
+/* На широком экране чат выбора ролей — самостоятельная правая колонка.
+   Нативный DOM остаётся на месте, поэтому React, отправка сообщений и состояние
+   раскрытия чата продолжают работать без подмены компонентов. */
+@media (min-width: 1100px) and (min-height: 620px) {
+  .role-selection-stage {
+    position: relative;
+    padding-right: 396px;
+  }
+  .role-selection-stage > .role-selection-bottom {
+    position: static;
+  }
+  .role-selection-stage .role-selection-chat-slot {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 380px;
+    min-width: 300px;
+    max-width: 500px;
+    min-height: 0;
+  }
+  .role-selection-stage .role-selection-chat {
+    grid-template-rows: minmax(0, 1fr) auto;
+    align-items: stretch;
+    gap: 0;
+    display: grid;
+    height: 100%;
+    min-height: 0;
+  }
+  .role-selection-stage .role-selection-chat-messages {
+    max-height: none;
+    min-height: 0;
+    padding-top: 18px;
+    overflow-y: auto;
+  }
+  .role-selection-stage .role-selection-chat-compose {
+    border-radius: 0 0 9px 9px;
+  }
+  .role-selection-stage .role-selection-chat-trigger {
+    display: none;
+  }
+}
+
 /* Сводка по ролям на экране выбора ролей (vxp-lobby-roles.js) */
 .vxp-roles-panel {
   min-width: 0;

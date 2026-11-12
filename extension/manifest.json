@@ -20,7 +20,7 @@
   "content_scripts": [
     {
       "matches": ["https://voxalike.com/*", "https://www.voxalike.com/*"],
-      "js": ["vxp-main.js", "vxp-bg.js", "vxp-fx.js","vxp-denoise.js","vxp-room.js", "vxp-lobby-shared.js", "vxp-lobby.js", "vxp-lobby-roles.js"],
+      "js": ["vxp-main.js", "vxp-bg.js", "vxp-fx.js","vxp-denoise.js","vxp-room.js", "vxp-lobby-shared.js", "vxp-lobby.js", "vxp-lobby-roles.js", "vxp-lobby-role-chat.js"],
       "css": ["vxp-lobby.css"],
       "run_at": "document_start",
       "world": "MAIN",
