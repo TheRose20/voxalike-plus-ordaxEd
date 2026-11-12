@@ -243,16 +243,30 @@
 .vxp-lobby-link { display: inline-block; color: inherit; font-weight: 700; white-space: nowrap; }
 
 /* ---------- Wide lobby layout ---------- */
+@media (min-width: 721px) and (min-height: 561px) {
+  /* Здесь joined-lobby-grid — сама .app-grid, а не потомок
+     .joined-room-shell. У гостя содержимое короче настроек хоста, поэтому
+     растягиваем всю фактическую цепочку до высоты grid-ячейки приложения. */
+  .app-grid.room-game-grid.joined-lobby-grid,
+  .app-grid.room-game-grid.joined-lobby-grid > .control-stack,
+  .app-grid.room-game-grid.joined-lobby-grid > .round-slot,
+  .app-grid.room-game-grid.joined-lobby-grid .lobby-room-page,
+  .app-grid.room-game-grid.joined-lobby-grid .lobby-main-layout {
+    align-self: stretch;
+    height: 100%;
+    min-height: 0;
+  }
+}
+
 @media (min-width: 1280px) and (min-height: 721px) {
-  .joined-room-shell > .screen-toolbar { display: none; }
-  .joined-room-shell .joined-lobby-grid { height: 100%; padding-top: 0; }
-  .joined-room-shell .joined-lobby-grid .room-side-panel {
+  .app-grid.room-game-grid.joined-lobby-grid { height: 100%; padding-top: 0; }
+  .app-grid.room-game-grid.joined-lobby-grid .room-side-panel {
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto;
     gap: 12px;
     overflow: hidden;
   }
-  .joined-room-shell .joined-lobby-grid .selected-pack-card {
+  .app-grid.room-game-grid.joined-lobby-grid .selected-pack-card {
     display: flex;
     flex-direction: column;
     min-height: 0;
@@ -261,18 +275,18 @@
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
-  .joined-room-shell .joined-lobby-grid .selected-pack-card::-webkit-scrollbar {
+  .app-grid.room-game-grid.joined-lobby-grid .selected-pack-card::-webkit-scrollbar {
     display: none;
   }
-  .joined-room-shell .joined-lobby-grid .selected-pack-content { display: contents; }
-  .joined-room-shell .joined-lobby-grid .selected-pack-content > span,
-  .joined-room-shell .joined-lobby-grid .selected-pack-content > h2,
-  .joined-room-shell .joined-lobby-grid .selected-pack-content > .selected-pack-creator,
-  .joined-room-shell .joined-lobby-grid .selected-pack-content > .selected-pack-meta,
-  .joined-room-shell .joined-lobby-grid .selected-pack-content > .selected-pack-roles { display: none; }
-  .joined-room-shell .joined-lobby-grid .selected-pack-content > .button-row { order: 2; }
-  .joined-room-shell .joined-lobby-grid .vxp-lobby-info { order: 1; }
-  .joined-room-shell .joined-lobby-grid .vxp-lobby-info {
+  .app-grid.room-game-grid.joined-lobby-grid .selected-pack-content { display: contents; }
+  .app-grid.room-game-grid.joined-lobby-grid .selected-pack-content > span,
+  .app-grid.room-game-grid.joined-lobby-grid .selected-pack-content > h2,
+  .app-grid.room-game-grid.joined-lobby-grid .selected-pack-content > .selected-pack-creator,
+  .app-grid.room-game-grid.joined-lobby-grid .selected-pack-content > .selected-pack-meta,
+  .app-grid.room-game-grid.joined-lobby-grid .selected-pack-content > .selected-pack-roles { display: none; }
+  .app-grid.room-game-grid.joined-lobby-grid .selected-pack-content > .button-row { order: 2; }
+  .app-grid.room-game-grid.joined-lobby-grid .vxp-lobby-info { order: 1; }
+  .app-grid.room-game-grid.joined-lobby-grid .vxp-lobby-info {
     display: block;
     flex: none;
     order: 1;
@@ -283,23 +297,23 @@
     border-top: 0;
     border-bottom: 2px solid color-mix(in srgb, currentColor 22%, transparent);
   }
-  .joined-room-shell .joined-lobby-grid .selected-pack-content > .button-row {
+  .app-grid.room-game-grid.joined-lobby-grid .selected-pack-content > .button-row {
     display: contents;
   }
-  .joined-room-shell .joined-lobby-grid .selected-pack-content > .button-row > .inline-pack-picker {
+  .app-grid.room-game-grid.joined-lobby-grid .selected-pack-content > .button-row > .inline-pack-picker {
     order: 0;
     padding: 14px 14px 0;
   }
-  .joined-room-shell .joined-lobby-grid .selected-pack-content > .button-row > :not(.inline-pack-picker) {
+  .app-grid.room-game-grid.joined-lobby-grid .selected-pack-content > .button-row > :not(.inline-pack-picker) {
     order: 2;
     margin-inline: 14px;
   }
-  .joined-room-shell .joined-lobby-grid .selected-pack-content > .button-row > .room-mode-picker {
+  .app-grid.room-game-grid.joined-lobby-grid .selected-pack-content > .button-row > .room-mode-picker {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
-  .joined-room-shell .joined-lobby-grid .selected-pack-content > .button-row > .room-mode-picker::before {
+  .app-grid.room-game-grid.joined-lobby-grid .selected-pack-content > .button-row > .room-mode-picker::before {
     grid-column: 1 / -1;
     content: 'Настройки';
     display: block;
@@ -308,29 +322,29 @@
     font-weight: 700;
   }
 
-  .joined-room-shell .joined-lobby-grid .room-pack-field-heading { display: none; }
-  .joined-room-shell .joined-lobby-grid .vxp-lobby-cover {
+  .app-grid.room-game-grid.joined-lobby-grid .room-pack-field-heading { display: none; }
+  .app-grid.room-game-grid.joined-lobby-grid .vxp-lobby-cover {
     float: none;
     width: 100%;
     height: auto;
     margin: 0;
   }
-  .joined-room-shell .joined-lobby-grid .vxp-lobby-description-row,
-  .joined-room-shell .joined-lobby-grid .vxp-lobby-tags,
-  .joined-room-shell .joined-lobby-grid .vxp-lobby-roles { clear: none; }
-  .joined-room-shell .joined-lobby-grid .room-pack-select-row > select { display: none; }
-  .joined-room-shell .joined-lobby-grid .vxp-pack-picker-button { display: block; }
-  .joined-room-shell .joined-lobby-grid .room-leave-button { flex: none; }
-  .joined-room-shell .joined-lobby-grid .lobby-main-layout { position: relative; padding-right: 396px; }
-  .joined-room-shell .joined-lobby-grid .room-invite-card { min-height: 48px; }
-  .joined-room-shell .joined-lobby-grid .player-lobby-panel {
+  .app-grid.room-game-grid.joined-lobby-grid .vxp-lobby-description-row,
+  .app-grid.room-game-grid.joined-lobby-grid .vxp-lobby-tags,
+  .app-grid.room-game-grid.joined-lobby-grid .vxp-lobby-roles { clear: none; }
+  .app-grid.room-game-grid.joined-lobby-grid .room-pack-select-row > select { display: none; }
+  .app-grid.room-game-grid.joined-lobby-grid .vxp-pack-picker-button { display: block; }
+  .app-grid.room-game-grid.joined-lobby-grid .room-leave-button { flex: none; }
+  .app-grid.room-game-grid.joined-lobby-grid .lobby-main-layout { position: relative; padding-right: 396px; }
+  .app-grid.room-game-grid.joined-lobby-grid .room-invite-card { min-height: 48px; }
+  .app-grid.room-game-grid.joined-lobby-grid .player-lobby-panel {
     position: static;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto;
     overflow: hidden;
   }
-  .joined-room-shell .joined-lobby-grid .player-lobby-panel > .lobby-player-grid {
+  .app-grid.room-game-grid.joined-lobby-grid .player-lobby-panel > .lobby-player-grid {
     grid-column: 1;
     grid-row: 1;
     min-height: 0;
@@ -338,7 +352,7 @@
     padding-right: 4px;
     overflow: hidden auto;
   }
-  .joined-room-shell .joined-lobby-grid .player-lobby-panel > .room-chat-panel {
+  .app-grid.room-game-grid.joined-lobby-grid .player-lobby-panel > .room-chat-panel {
     z-index: 2;
     position: absolute;
     top: 0;
@@ -350,30 +364,30 @@
     display: grid;
     box-shadow: none;
   }
-  .joined-room-shell .joined-lobby-grid .player-lobby-panel > .room-chat-panel.open { height: auto; }
-  .joined-room-shell .joined-lobby-grid .player-lobby-panel > .room-chat-panel > .room-chat-label {
+  .app-grid.room-game-grid.joined-lobby-grid .player-lobby-panel > .room-chat-panel.open { height: auto; }
+  .app-grid.room-game-grid.joined-lobby-grid .player-lobby-panel > .room-chat-panel > .room-chat-label {
     min-height: 30px;
     max-height: 30px;
     padding-block: 5px;
     overflow: hidden;
   }
-  .joined-room-shell .joined-lobby-grid .player-lobby-panel > .room-chat-panel .room-chat-body {
+  .app-grid.room-game-grid.joined-lobby-grid .player-lobby-panel > .room-chat-panel .room-chat-body {
     min-height: 0;
     height: calc(100% - 30px);
     overflow: hidden;
     grid-template-rows: minmax(0, 1fr) auto;
   }
-  .joined-room-shell .joined-lobby-grid .player-lobby-panel > .room-chat-panel .room-chat-compose { margin: 0; }
-  .joined-room-shell .joined-lobby-grid .player-lobby-panel > .room-chat-panel .room-chat-error:empty { display: none; }
-  .joined-room-shell .joined-lobby-grid .player-lobby-panel > .room-chat-panel .room-chat-messages {
+  .app-grid.room-game-grid.joined-lobby-grid .player-lobby-panel > .room-chat-panel .room-chat-compose { margin: 0; }
+  .app-grid.room-game-grid.joined-lobby-grid .player-lobby-panel > .room-chat-panel .room-chat-error:empty { display: none; }
+  .app-grid.room-game-grid.joined-lobby-grid .player-lobby-panel > .room-chat-panel .room-chat-messages {
     min-height: 0;
     overflow-y: auto;
   }
-  .joined-room-shell .joined-lobby-grid .player-lobby-panel > .room-chat-panel .room-chat-message {
+  .app-grid.room-game-grid.joined-lobby-grid .player-lobby-panel > .room-chat-panel .room-chat-message {
     user-select: text;
     -webkit-user-select: text;
   }
-  .joined-room-shell .joined-lobby-grid .player-lobby-panel > .lobby-action-dock { grid-column: 1; grid-row: 2; }
+  .app-grid.room-game-grid.joined-lobby-grid .player-lobby-panel > .lobby-action-dock { grid-column: 1; grid-row: 2; }
 }
 
 @media (max-width: 900px) {
