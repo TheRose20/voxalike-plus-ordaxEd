@@ -164,6 +164,9 @@
   border-radius: 6px;
 }
 
+/* Нативная мини-обложка дублирует полную обложку .vxp-lobby-cover ниже. */
+.selected-pack-card .selected-pack-cover { display: none; }
+
 /* ---------- Current pack details ---------- */
 .vxp-lobby-info {
   display: block;
