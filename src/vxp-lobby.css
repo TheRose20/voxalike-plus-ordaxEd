@@ -428,31 +428,77 @@
 }
 
 /* Портрет роли как фон карточки (vxp-lobby-roles.js).
-   Портрет прижат к правому краю, к левому уходит в прозрачность: текст читается на затемнении. */
+   Слои: ::before — портрет (зумится, обесцвечивается), ::after — затемнение под текст.
+   Портрет НЕ лежит в background карточки: нативный :hover ставит сплошной background и
+   перекрыл бы картинку — поэтому hover перекрываем отдельно, а слои живут ниже текста. */
 .role-selection-card[data-vxp-role-avatar] {
-  /* Нативная карточка задаёт непрозрачный background:#0d161fdb — он рисуется ПОД картинкой,
-     поэтому фон самой карточки надо сделать прозрачным, иначе портрет не виден. */
-  background-color: transparent;
-  background-image:
-    linear-gradient(90deg, #0d161f 0%, #0d161f 38%, #0d161fe6 62%, #0d161f00 100%),
-    var(--vxp-role-portrait);
-  background-repeat: no-repeat, no-repeat;
-  background-position: right center, right center;
-  background-size: auto, auto 100%;
+  position: relative;
+  isolation: isolate;
   overflow: hidden;
+  /* Нативный фон непрозрачен — убираем его, иначе не видно портрет. Тон даёт ::after. */
+  background-color: transparent;
+  background-image: none;
+  transition: border-color .15s;
 }
-/* Отдельный слой затемнения не нужен: левая часть градиента непрозрачная,
-   поэтому текст остаётся контрастным на любой картинке. */
+.role-selection-card[data-vxp-role-avatar]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-color: #0d161f;
+  background-image: var(--vxp-role-portrait);
+  background-repeat: no-repeat;
+  /* Прижат к правому краю, по высоте карточки. */
+  background-position: right center;
+  background-size: auto 100%;
+  /* Левый край картинки сам уходит в прозрачность: портрет растворяется в фоне под текстом. */
+  -webkit-mask-image: linear-gradient(90deg, #0000 0%, #0000004d 14%, #000000d9 30%, #000 45%, #000 100%);
+  mask-image: linear-gradient(90deg, #0000 0%, #0000004d 14%, #000000d9 30%, #000 45%, #000 100%);
+  transform-origin: right center;
+  transition: transform .28s ease, filter .28s ease, opacity .28s ease;
+  pointer-events: none;
+}
+/* Затемнение целиком в левой четверти и плавно уходит в ноль к 25% ширины. */
+.role-selection-card[data-vxp-role-avatar]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: linear-gradient(90deg, #0d161f 0%, #0d161fea 10%, #0d161fc4 16%, #0d161f7a 21%, #0d161f24 24%, #0d161f00 26%);
+  pointer-events: none;
+}
 .role-selection-card[data-vxp-role-avatar] > strong,
 .role-selection-card[data-vxp-role-avatar] > small {
   position: relative;
   z-index: 1;
   text-shadow: 0 1px 2px #0a1119cc;
 }
-@media (max-width: 800px), (orientation: landscape) and (max-height: 719px) {
-  .role-selection-card[data-vxp-role-avatar] {
-    background-image:
-      linear-gradient(90deg, #0d161f 0%, #0d161ff2 45%, #0d161f00 92%),
-      var(--vxp-role-portrait);
-  }
+/* Нативный hover заливает карточку сплошным цветом поверх слоёв — оставляем только рамку. */
+.role-selection-card[data-vxp-role-avatar]:hover:not(:disabled) {
+  background-color: transparent;
+  background-image: none;
+}
+/* Лёгкий зум портрета при наведении. */
+.role-selection-card[data-vxp-role-avatar]:hover::before,
+.role-selection-card[data-vxp-role-avatar]:focus-visible::before { transform: scale(1.08); }
+
+/* Роль занята кем-то другим — портрет обесцвечен. */
+.role-selection-card[data-vxp-role-avatar].claimed::before {
+  filter: grayscale(1);
+  opacity: .5;
+}
+
+/* Моя роль — портрет во всю ширину карточки. */
+.role-selection-card[data-vxp-role-avatar].claimed.mine::before {
+  filter: none;
+  opacity: 1;
+  background-position: center;
+  background-size: cover;
+  /* Своя роль — портрет целиком, без растворяющегося левого края. */
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+/* ...и затемнения под текстом больше нет: остаётся только мягкая тень для читаемости. */
+.role-selection-card[data-vxp-role-avatar].claimed.mine::after {
+  background-image: linear-gradient(90deg, #0d161fd9 0%, #0d161f73 40%, #0d161f1f 70%, #0d161f00 100%);
 }
