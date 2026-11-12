@@ -47,22 +47,21 @@
       return label.split('·')[0].trim();
     }
 
-    // Аватары на нативных карточках ролей. Клик по картинке не должен прерывать захват роли:
-    // pointer-events:none ставится в CSS, поэтому здесь только вставка.
+    // Портрет — фон карточки, прижатый к правому краю, с прозрачностью к левому (маска в CSS).
+    // Путь передаётся через CSS-переменную: blob-URL может содержать символы, поэтому url("...").
     function installAvatars(urls) {
       for (const card of qsa('.role-selection-card')) {
         const role = cardRoleName(card);
-        if (!role) continue;
-        const url = urls.get(role);
-        const existing = card.querySelector('.vxp-role-avatar');
-        if (!url) { if (existing) existing.remove(); continue; }
-        if (existing) {
-          if (existing.getAttribute('src') !== url) existing.setAttribute('src', url);
+        const url = role ? urls.get(role) : null;
+        const old = card.querySelector('.vxp-role-avatar');
+        if (old) old.remove();
+        if (!url) {
+          card.removeAttribute('data-vxp-role-avatar');
+          card.style.removeProperty('--vxp-role-portrait');
           continue;
         }
-        const img = h('img', { class: 'vxp-role-avatar', src: url, alt: '', 'aria-hidden': 'true' });
-        img.addEventListener('error', () => img.remove());
-        card.prepend(img);
+        card.setAttribute('data-vxp-role-avatar', '1');
+        card.style.setProperty('--vxp-role-portrait', 'url("' + url + '")');
       }
     }
 
