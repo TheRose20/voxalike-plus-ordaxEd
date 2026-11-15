@@ -648,4 +648,3 @@ registerProcessor('vxp-nr',VxpNRProc);`;
     return autoAlign(ref.samples, ref.sr, wide, m.sr, lo);
   }
   VXP.dsp = { applyEq, compress, deEss, limiter, avgSpectrum, spectrumAt, biquadCoefs, biquadDb, denoiseTrack, VxpNRCore, pitchShift, timeStretch, highpass, lowpass, underwater, echo, space, renderModel, assemble, autoAlign, alignOffset, locate, initSegs, segsPristine, isDefaultModel };
-

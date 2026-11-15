@@ -126,7 +126,7 @@
      Порядок загрузки не важен: если модуль пришёл раньше, он ждёт в window.__VXP_PLUGINS__. */
   VXP.modules = {}; VXP.settingsExtras = []; VXP.fxExtras = [];
   VXP.api = {
-    version: VERSION, h, tr, qs, qsa, toast, settings, saveSettings, checkbox, onBus, emit,
+    version: VERSION, myId: () => myId() || null, icon: (n) => svgIcon(n), h, tr, qs, qsa, toast, settings, saveSettings, checkbox, onBus, emit,
     fetch: (...a) => origFetch.apply(window, a),
     /** cb({id, host, slot, card, img}) — для каждой карточки игрока в лобби (и для уже найденных). slot — свободный блок под ник. */
     onPlayerCard(cb) { cardHooks.push(cb); for (const c of cardCtxs) { try { cb(c); } catch (e) { console.warn('[Voxalike+OrdaxEd] module', e); } } },

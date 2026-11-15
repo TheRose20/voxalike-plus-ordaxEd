@@ -77,10 +77,14 @@
     panel.editor = editor;
     panel.bufInfo = h('div', { class: 'vxp-hint' });
     panel.queueBox = h('div', { class: 'vxp-sec', 'data-sec': 'queue', style: 'display:none' });
+    const fxPanel = fxControls(nativeTarget);
     const root = h('div', { class: 'vxp-panel', id: 'vxp-panel' },
       brandBar(false),
       section('tracks', tr('Дорожки', 'Tracks'), editor.root, panel.bufInfo),
-      section('fx', tr('Обработка', 'Processing'), fxControls(nativeTarget)),
+      section('fx', tr('Обработка звука', 'Sound processing'), fxPanel.main),
+      section('space', tr('Пространство', 'Space'), fxPanel.space),
+      section('effector', tr('Эффектор голоса', 'Voice effector'), fxPanel.effector),
+      section('pro', tr('Эквалайзер и динамика', 'EQ and dynamics'), fxPanel.pro),
       section('mic', tr('Запись', 'Recording'), micControls(), guideCheckbox(), timingControls()),
       section('nr', tr('Шумодав', 'Noise suppression'), nrControls()),
       panel.queueBox,

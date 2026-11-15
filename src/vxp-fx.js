@@ -7,7 +7,7 @@
  */
 (() => {
   'use strict';
-  const NAME = 'fx', VERSION = '1.1.0';
+  const NAME = 'fx', VERSION = '1.2.1';
   const KEY = 'vxp-fx:v1';
 
   /* ---------------- параметры ---------------- */
@@ -254,6 +254,10 @@
 
   /* ---------------- интерфейс: студия эффектора ---------------- */
   const CSS = `
+.vfx-card,.vfx-card *{scrollbar-width:thin;scrollbar-color:rgba(var(--va3,255,90,0),.55) transparent}
+.vfx-card::-webkit-scrollbar,.vfx-card *::-webkit-scrollbar{width:8px;height:8px}
+.vfx-card::-webkit-scrollbar-track,.vfx-card *::-webkit-scrollbar-track{background:transparent}
+.vfx-card::-webkit-scrollbar-thumb,.vfx-card *::-webkit-scrollbar-thumb{background:rgba(var(--va3,255,90,0),.5);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
 .vfx-card{width:min(880px,97vw);max-height:94vh;overflow:auto;border-radius:20px;border:1px solid rgba(var(--va3,255,90,0),.35);background:radial-gradient(120% 90% at 50% 0%,#1b1d26 0%,#0d0e13 62%,#08090c 100%);box-shadow:0 30px 90px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.06);color:#eceff6;padding:16px 18px 14px;display:grid;gap:14px;position:relative}
 .vfx-top{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding-right:30px}
 .vfx-title{font:950 13px/1 inherit;letter-spacing:.2em;color:var(--va,#ff5a00);text-transform:uppercase;white-space:nowrap}
@@ -413,7 +417,7 @@
       nameEl = h('div', { class: 'vfx-name' });
       pwrEl = h('button', { class: 'vfx-pwr', type: 'button', title: tr('Включить / выключить эффектор', 'Effector on/off'), onclick: () => { patch({ on: !cur().on }, true); syncPreset(); } }, '⏻');
       const top = h('div', { class: 'vfx-top' },
-        h('div', { class: 'vfx-title' }, '🎭 ' + tr('Эффектор голоса', 'Voice effector'), h('small', null, 'ORDAX FX')),
+        h('div', { class: 'vfx-title' }, api.icon ? api.icon('mic') : null, ' ' + tr('Эффекты голоса', 'Voice effects'), h('small', null, 'ORDAX FX')),
         h('div', { class: 'vfx-pre' }, h('button', { class: 'arrow', type: 'button', title: tr('Предыдущий пресет', 'Previous preset'), onclick: () => step(-1) }, '◀'), nameEl, h('button', { class: 'arrow', type: 'button', title: tr('Следующий пресет', 'Next preset'), onclick: () => step(1) }, '▶')),
         pwrEl);
 
@@ -483,7 +487,7 @@
     api.addFxExtra({
       id: 'vox',
       build(ctx) {
-        const btn = h('button', { class: 'vxp-btn primary wide', type: 'button', title: tr('Питч и формант, суб-октава, хор, рык, робот, дисторшн и пресеты: демон, дракон, веном', 'Pitch and formant, sub octave, chorus, growl, robot, drive and presets: demon, dragon, venom'), onclick: () => openStudio(ctx) }, '🎭 ' + tr('ЭФФЕКТОР ГОЛОСА · питч, формант, рык', 'VOICE EFFECTOR · pitch, formant, growl'));
+        const btn = h('button', { class: 'vxp-btn wide link', type: 'button', title: tr('Питч и формант, суб-октава, хор, рык, робот, дисторшн и пресеты: демон, дракон, веном', 'Pitch and formant, sub octave, chorus, growl, robot, drive and presets: demon, dragon, venom'), onclick: () => openStudio(ctx) }, h('span', { class: 'vxp-lb' }, api.icon ? api.icon('mic') : null, 'ORDAX FX · ' + tr('эффекты голоса', 'voice effects')));
         const on = checkbox({ label: tr('Эффектор включён', 'Effector on'), get: () => cur().on, set: (v) => { patch({ on: v }, true); }, title: tr('Обработать мою дорожку эффектором. Работает по готовой записи', 'Process my take with the effector. Works on the recorded take') });
         return h('div', { style: 'display:grid;gap:7px' }, btn, on);
       },

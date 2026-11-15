@@ -372,4 +372,3 @@
   }
   const isDefaultModelEdit = (m) => segsPristine(m) && !m.params.offset;
   VXP.TrackEditor = TrackEditor;
-

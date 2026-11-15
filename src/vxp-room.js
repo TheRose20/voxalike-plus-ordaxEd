@@ -7,7 +7,7 @@
  */
 (() => {
   'use strict';
-  const NAME = 'room', VERSION = '1.1.0';
+  const NAME = 'room', VERSION = '1.2.0';
   const DEF = { on: false, k: 100 };
   const ROOM = (() => {
     const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -138,10 +138,11 @@
     };
     api.addFxExtra({
       id: 'room',
+      group: 'space',
       build(ctx) {
         const cur = () => Object.assign({}, DEF, settings.fx.room || {});
         const patch = (o, done) => { settings.fx.room = Object.assign({}, cur(), o); if (done) { saveSettings(); ctx.commit(); } };
-        const on = checkbox({ label: tr('🏠 Убрать эхо комнаты (авто)', '🏠 Remove room echo (auto)'), get: () => !!(settings.fx.room && settings.fx.room.on), set: (v) => patch({ on: v }, true), title: tr('Мод сам послушает вашу запись и подберёт настройки. Работает по готовой записи', 'The mod listens to your take and picks the settings itself. Works on the recorded take') });
+        const on = checkbox({ label: '', get: () => !!(settings.fx.room && settings.fx.room.on), set: (v) => patch({ on: v }, true), title: tr('Автоматически подбирает и убирает эхо комнаты из вашей записи', 'Automatically picks and removes the room echo from your take') });
         const info = h('div', { class: 'vxp-hint' });
         const fmtInfo = () => {
           const a = roomfx.last;
@@ -156,8 +157,12 @@
         const ab = h('div', { class: 'vxp-row' },
           h('button', { class: 'vxp-btn small', type: 'button', title: tr('Послушать мою дорожку без этой обработки', 'Listen without this processing'), onclick: () => ctx.ab({ room: { on: false } }) }, tr('▶ Без неё', '▶ Without')),
           h('button', { class: 'vxp-btn small', type: 'button', title: tr('Послушать мою дорожку с обработкой', 'Listen with the processing'), onclick: () => ctx.ab({ room: Object.assign({}, cur(), { on: true }) }) }, tr('▶ С ней', '▶ With')));
-        const box = h('div', { style: 'display:grid;gap:7px' }, on, info, sl, ab);
-        const upd = () => { info.textContent = fmtInfo(); };
+        const ic = api.icon ? api.icon('room') : null;
+        const head = h('div', { class: 'vxp-pnh' }, ic, h('b', null, tr('Убрать комнату', 'Remove room')), on);
+        const t60 = h('div', { class: 'vxp-t60' });
+        const box = h('div', { class: 'vxp-room-pn' }, head, sl, t60, info, ab);
+        const showT60 = () => { const a = roomfx.last; t60.textContent = cur().on && a && a.amt >= 3 ? tr('Эхо в записи (T60): ≈ ' + a.t60.toFixed(1) + ' с, определено автоматически', 'Echo in the take (T60): ≈ ' + a.t60.toFixed(1) + ' s, detected automatically') : ''; t60.style.display = t60.textContent ? '' : 'none'; };
+        const upd = () => { info.textContent = fmtInfo(); showT60(); };
         box._sync = upd; upd();
         const t = setInterval(() => { if (!box.isConnected) { clearInterval(t); return; } upd(); }, 900);
         try { api.widgets.add(box); } catch {}
