@@ -177,7 +177,7 @@
   let mountScheduled = false;
   function ensureMounted() {
     mountScheduled = false;
-    injectCss();
+    applyTheme();
     const deck = qs('.single-stage-control-deck');
     if (deck && !qs('#vxp-panel', deck)) {
       try { buildPanel(deck); } catch (e) { console.warn('[Voxalike+OrdaxEd] panel', e); }
