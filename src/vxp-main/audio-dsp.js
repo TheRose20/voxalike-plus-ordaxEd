@@ -366,10 +366,14 @@ registerProcessor('vxp-nr',VxpNRProc);`;
     core.setStrength(strength);
     if (settings.nrProf && settings.nrProf.p) { core.setProfile(Float32Array.from(settings.nrProf.p), settings.nrProf.sr); core.fixed = true; }
     else { const pr = estimateNoise(x, sr); if (pr) { core.setProfile(pr, sr); core.fixed = true; } }
-    const xin = new Float32Array(n + D); xin.set(x);
-    const y = new Float32Array(n + D);
+    // Прогрев: оценщик минимумов стартует с первого кадра, поэтому сначала прогоняем развёрнутое начало дорожки (до 1.5 с) и отбрасываем результат
+    const P = Math.min(n, Math.round(sr * 1.5));
+    const xin = new Float32Array(P + n + D);
+    for (let i = 0; i < P; i++) xin[i] = x[P - 1 - i];
+    xin.set(x, P);
+    const y = new Float32Array(xin.length);
     for (let i = 0; i < xin.length; i += core.H) core.process(xin.subarray(i, Math.min(i + core.H, xin.length)), y.subarray(i, Math.min(i + core.H, xin.length)));
-    return y.slice(D, D + n);
+    return y.slice(P + D, P + D + n);
   }
 
   /* ---------- ORDAX FX: эквалайзер, компрессор, дэ-эссер, лимитер (офлайн, для дорожки) ---------- */

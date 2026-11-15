@@ -64,23 +64,33 @@
     return y;
   }
   /** Прогнать дорожку через сеть (48 кГц), вернуть выровненный по задержке результат. */
-  function run(eng, x48, delay) {
-    const F = eng.frame, n = x48.length, total = n + delay, frames = Math.ceil(total / F), out = new Float32Array(frames * F), st = eng.create();
+  function run(eng, x48, delay, warm) {
+    const F = eng.frame, n0 = x48.length;
+    // Прогрев: у сети есть внутреннее состояние, с нулевого оно первые секунды «не знает» шума.
+    // Перед дорожкой прогоняем её же начало, развёрнутое задом наперёд (стык без щелчка), результат отбрасываем.
+    const pre = warm === false ? 0 : Math.ceil(Math.min(n0, 96000) / F) * F;
+    let x = x48;
+    if (pre) {
+      x = new Float32Array(pre + n0);
+      for (let i = 0; i < pre; i++) x[i] = x48[Math.max(0, Math.min(n0 - 1, pre - 1 - i))];
+      x.set(x48, pre);
+    }
+    const n = x.length, total = n + delay, frames = Math.ceil(total / F), out = new Float32Array(frames * F), st = eng.create();
     try {
       const buf = new Float32Array(F);
       for (let f = 0; f < frames; f++) {
         const s = f * F; buf.fill(0);
-        for (let i = 0; i < F; i++) { const q = s + i; if (q < n) buf[i] = x48[q]; }
+        for (let i = 0; i < F; i++) { const q = s + i; if (q < n) buf[i] = x[q]; }
         out.set(st.run(buf), s);
       }
     } finally { st.destroy(); }
-    return out.subarray(delay, delay + n);
+    return out.subarray(pre + delay, pre + delay + n0);
   }
   /** Задержку сети находим по взаимной корреляции на шумовой пачке. */
   function calibrate(eng) {
     const sr = 48000, n = sr, x = new Float32Array(n); let seed = 7;
     for (let i = 0; i < n; i++) { seed = (seed * 16807) % 2147483647; const env = i > 4000 && i < 30000 ? 1 : 0; x[i] = env * (seed / 2147483647 - 0.5) * 0.5 * Math.sin(i * 0.05 + Math.sin(i * 0.002) * 8); }
-    const y = run(eng, x, 0); let best = 0, bd = 0;
+    const y = run(eng, x, 0, false); let best = 0, bd = 0;
     for (let d = 0; d < 3000; d += 1) { let c = 0; for (let i = 5000; i < 28000; i += 3) c += x[i] * y[i + d]; if (c > best) { best = c; bd = d; } }
     return bd;
   }
