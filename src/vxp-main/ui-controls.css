@@ -879,7 +879,7 @@ canvas.vxp-eqcv {
 }
 .vxp-card {
     align-items: start;
-    width: min(1100px, 100%);
+    width: min(1500px, 100%);
     max-height: calc(100vh - 32px);
     overflow: auto;
     background:
@@ -894,7 +894,7 @@ canvas.vxp-eqcv {
     border-radius: 14px;
     box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65);
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 310px;
+    grid-template-columns: 270px minmax(0, 1fr) 330px;
     gap: 14px;
     padding: 16px;
 }
@@ -1143,14 +1143,50 @@ canvas.vxp-eqcv {
 .vxp-help b {
     color: var(--vt);
 }
-.vxp-side .vxp-lines {
-    max-height: 260px;
+.vxp-left {
+    display: grid;
+    align-content: start;
+    min-width: 0;
+    position: sticky;
+    top: 0;
+}
+.vxp-left .vxp-lines {
+    max-height: calc(100vh - 190px);
+}
+/* средняя ширина: список реплик под видео, справа — обработка */
+@media (max-width: 1260px) {
+    .vxp-card {
+        width: min(1100px, 100%);
+        grid-template-columns: minmax(0, 1fr) 310px;
+    }
+    .vxp-left {
+        grid-column: 1;
+        grid-row: 3;
+        position: static;
+    }
+    .vxp-stagebox {
+        grid-column: 1;
+        grid-row: 2;
+    }
+    .vxp-side {
+        grid-column: 2;
+        grid-row: 2 / span 2;
+    }
+    .vxp-left .vxp-lines {
+        max-height: 220px;
+    }
 }
 @media (max-width: 860px) {
     .vxp-card {
         grid-template-columns: 1fr;
     }
-    .vxp-side .vxp-lines {
+    .vxp-left,
+    .vxp-stagebox,
+    .vxp-side {
+        grid-column: 1;
+        grid-row: auto;
+    }
+    .vxp-left .vxp-lines {
         max-height: 160px;
     }
 }
