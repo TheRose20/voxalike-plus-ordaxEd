@@ -76,13 +76,13 @@
       this.videoBox = h('div', { class: 'vxp-video' }, this.video, this.cue);
       this.subSpeaker = h('span'); this.subText = h('p');
       this.editor = new TrackEditor({
-        onChange: () => { if (this.model) this.dirty = true; },
+        onChange: () => { if (this.model) this.dirty = true; this.updateLoud && this.updateLoud(); },
         onPlay: () => this.playMine(true),
       });
       this.editor.canvas.classList.add('big');
       
       this.btnRecord = h('button', { class: 'vxp-btn rec wide big', title: tr('Запись / стоп (клавиша R)', 'Record / stop (R key)'), type: 'button', onclick: () => this.doRecord(false) }, tr('● Записать', '● Record'));
-      this.btnRerecord = h('button', { class: 'vxp-btn wide big', title: tr('Перезаписать реплику с начала (Shift+R)', 'Re-record the line from the start (Shift+R)'), type: 'button', onclick: () => this.doRecord(true) }, tr('⟲ Перезаписать', '⟲ Re-record'));
+      this.btnRerecord = h('button', { class: 'vxp-btn wide big', title: tr('Перезаписать реплику с начала (Shift+R)', 'Re-record the line from the start (Shift+R)'), type: 'button', onclick: () => this.askRerecord() }, tr('⟲ Перезаписать', '⟲ Re-record'));
       
       this.btnOrig = h('button', { class: 'vxp-btn', type: 'button', onclick: () => this.playOriginal() }, tr('▶ Оригинал', '▶ Original'));
       this.btnMine = h('button', { class: 'vxp-btn', type: 'button', onclick: () => this.playMine(false) }, tr('▶ Моя запись', '▶ My take'));
@@ -101,6 +101,7 @@
         this.laneO = h('button', { class: 'vxp-lane o', type: 'button', onclick: () => this.setSrc('orig') }, h('i'), tr('Оригинал', 'Original'));
         this.laneM = h('button', { class: 'vxp-lane m on', type: 'button', onclick: () => this.setSrc('mine') }, h('i'), tr('Моя запись', 'My take'));
         // скрытые носители логики: кнопки «Оригинал» и «Моя запись» продолжают управлять воспроизведением
+        this.loudO = h('span', { class: 'vxp-loud o' }); this.loudM = h('span', { class: 'vxp-loud m' });
         this.btnOrig.style.display = 'none'; this.btnMine.style.display = 'none';
         this.tPlay = h('button', { class: 'vxp-btn vxp-tplay', type: 'button', onclick: () => (this.src === 'orig' ? this.btnOrig : this.btnMine).click() });
         const syncPlay = () => {
@@ -128,7 +129,7 @@
         this.doc.addEventListener('mousedown', (e) => { if (this.nudgePop.classList.contains('open') && !e.target.closest('.vxp-nudgewrap')) this.nudgePop.classList.remove('open'); }, true);
         const draw0 = ed.draw.bind(ed); ed.draw = () => { draw0(); this.updateTime(); };
         ed.root.replaceChildren(
-          h('div', { class: 'vxp-wavebox' }, ed.canvas, this.laneO, this.laneM, this.timeEl),
+          h('div', { class: 'vxp-wavebox' }, ed.canvas, this.laneO, this.loudO, this.laneM, this.loudM, this.timeEl),
           h('div', { class: 'vxp-transport' },
             h('div', { class: 'vxp-tgrp' }, ed.btnCut, ed.btnDel, ed.btnUndo, ed.btnReset),
             h('i', { class: 'vxp-sep' }),
@@ -265,7 +266,7 @@
       if (k === 'Escape' && (ed.sel.size || ed.tool !== 'move')) { ed.handleKey(e); e.preventDefault(); }
       else if (k === 'Escape') { e.preventDefault(); this.close(); }
       else if (ctrl) { if (ed.handleKey(e)) e.preventDefault(); else return; }
-      else if ('rRкК'.includes(k)) { e.preventDefault(); this.doRecord(e.shiftKey); }
+      else if ('rRкК'.includes(k)) { e.preventDefault(); e.shiftKey ? this.askRerecord() : this.doRecord(false); }
       else if (k === ' ') { e.preventDefault(); this.playMine(false); }
       else if (k === 'Enter') { e.preventDefault(); this.save(true); }
       else if (k === '[' || k === 'х') { e.preventDefault(); this.editor.nudge(e.shiftKey ? -50 : -10); }
@@ -286,7 +287,7 @@
       const done = mine.filter((a) => ['sent', 'ready'].includes(lineStatus(g, a))).length;
       this.kicker.textContent = done + ' / ' + mine.length;
     }
-    refreshEditor() { this.editor.set(this.ref, this.model); this.updateButtons(); }
+    refreshEditor() { this.editor.set(this.ref, this.model); this.updateButtons(); this.updateLoud && this.updateLoud(); }
     async select(index) {
       const g = room.state && room.state.game; if (!g || index == null) return;
       if (this.dirty && this.model) this.save(false);
@@ -322,6 +323,22 @@
         return c == null ? '' : typeof c === 'string' ? c : c.name || c.title || '';
       }).filter(Boolean).join(' · ');
     }
+    /** Средняя громкость (RMS, дБ отн. полной шкалы) по звучащим окнам 50 мс; для моей записи — по всем кускам вместе с усилением. */
+    updateLoud() {
+      try {
+        const m = this.model, ref = this.ref;
+        const key = this.index + '|' + (ref ? ref.samples.length : 0) + '|' + (m ? m.segs && JSON.stringify(m.segs.map((q) => [q.a, q.b])) + '|' + (m.params.gain || 0) : '');
+        if (key === this._loudKey) return; this._loudKey = key;
+        const meas = (parts, sr, gainDb) => {
+          const W = Math.max(64, Math.round(sr * 0.05)); let sum = 0, n = 0;
+          for (const [x, a, b] of parts) for (let i = a; i + W <= b; i += W) { let e = 0; for (let k = i; k < i + W; k++) e += x[k] * x[k]; e /= W; if (e > 1e-5) { sum += e; n++; } }
+          return n ? 10 * Math.log10(sum / n) + gainDb : null;
+        };
+        const fmt = (v) => v == null ? '' : tr('средняя ', 'avg ') + v.toFixed(1).replace('-', '−') + ' ' + tr('дБ', 'dB');
+        this.loudO.textContent = ref ? fmt(meas([[ref.samples, 0, ref.samples.length]], ref.sr, 0)) : '';
+        this.loudM.textContent = m ? fmt(meas((m.segs || [{ a: 0, b: m.base.length }]).map((q) => [m.base, q.a, Math.min(q.b, m.base.length)]), m.sr, (m.params.gain || 0))) : '';
+      } catch {}
+    }
     setSrc(k) {
       this.src = k; this.laneO.classList.toggle('on', k === 'orig'); this.laneM.classList.toggle('on', k === 'mine');
       this.syncPlay && this.syncPlay();
@@ -353,7 +370,8 @@
       } else {
         this.btnRecord.textContent = this.model ? tr('➕ Запись с метки', '➕ Record at marker') : tr('● Записать', '● Record');
         this.btnRecord.disabled = busy || this.counting;
-        this.btnRerecord.textContent = tr('⟲ Перезаписать', '⟲ Re-record');
+        this.btnRerecord.textContent = this.rerecPending ? tr('⚠ Точно перезаписать?', '⚠ Really re-record?') : tr('⟲ Перезаписать', '⟲ Re-record');
+        this.btnRerecord.classList.toggle('ask', !!this.rerecPending);
         this.btnRerecord.disabled = busy || this.counting || !this.model;
       }
       
@@ -398,6 +416,12 @@
       player.play({ tracks, media, dur, startAt,
         onTick: (t) => { ed.playhead = t; ed.draw(); },
         onEnd: () => { ed.playhead = null; ed.setPlaying(false); ed.draw(); this.btnMine.textContent = tr('▶ Моя запись', '▶ My take'); this.video.pause(); try { this.video.currentTime = c.videoStartSeconds; } catch {} } });
+    }
+    /** Перезапись затирает текущий дубль, поэтому просим подтвердить вторым нажатием (3,5 с). */
+    askRerecord() {
+      if (!this.model || this.rec || this.rerecPending) { this.rerecPending = false; clearTimeout(this.rerecTimer); return this.doRecord(true); }
+      this.rerecPending = true; this.updateButtons();
+      this.rerecTimer = setTimeout(() => { this.rerecPending = false; this.updateButtons(); }, 3500);
     }
     async doRecord(isRerecord) {
       if (this.counting || this.starting || this.saving) return;

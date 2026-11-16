@@ -1342,3 +1342,9 @@ canvas.vxp-eqcv {
 .vxp-keys .vxp-ic{width:14px;height:14px}
 .vxp-keys p{margin:8px 0 0;line-height:1.5}
 @media (max-width:720px){.vxp-sep{display:none}.vxp-transport{justify-content:center}}
+
+.vxp-loud{position:absolute;left:10px;z-index:2;font-size:10.5px;font-weight:800;color:var(--vd);letter-spacing:.02em;pointer-events:none;padding:1px 6px;border-radius:6px;background:rgba(5,8,14,.6);font-variant-numeric:tabular-nums}
+.vxp-loud:empty{display:none}
+.vxp-loud.o{top:48px}
+.vxp-loud.m{top:120px}
+.vxp-recpair .vxp-btn.ask{background:rgba(255,176,32,.16);border-color:var(--vw);color:var(--vw);animation:vxpPulse 1s ease-in-out infinite}
