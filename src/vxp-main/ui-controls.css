@@ -1257,7 +1257,7 @@ canvas.vxp-eqcv {
 /* ===== Чат комнаты внутри студии ===== */
 .vxp-chatslot:empty{display:none}
 .vxp-chatslot{min-width:0;height:300px;display:flex;flex-direction:column}
-.vxp-chatslot .room-chat-panel{box-sizing:border-box;position:static!important;inset:auto!important;transform:none!important;width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;margin:0!important;display:flex!important;flex-direction:column;min-height:0;box-shadow:none!important;border:1px solid var(--vl2)!important;border-radius:11px!important;background:var(--v1)!important;overflow:hidden}
+.vxp-chatslot .room-chat-panel,.vxp-chatslot .room-chat-panel.fixed-chat{box-sizing:border-box;position:static!important;inset:auto!important;transform:none!important;width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;margin:0!important;display:flex!important;flex-direction:column;min-height:0;box-shadow:none!important;border:1px solid var(--vl2)!important;border-radius:11px!important;background:var(--v1)!important;overflow:hidden}
 .vxp-chatslot .room-chat-body{flex:1;min-height:0;display:grid;grid-template-rows:minmax(0,1fr) auto;overflow:hidden}
 .vxp-chatslot .room-chat-messages{min-height:0;overflow-y:auto}
 .vxp-chatslot .room-chat-message{user-select:text;-webkit-user-select:text}

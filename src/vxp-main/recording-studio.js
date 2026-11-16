@@ -150,11 +150,18 @@
       this.close();
       openStudio(idx, { popout });
     }
-    /** Родной чат комнаты Voxalike переносим в студию целиком (React-узел не пересоздаём), при закрытии возвращаем на место. */
-    dockChat() {
+    /** Родной чат комнаты Voxalike (aside.room-chat-panel внутри .in-game-room-chat) переносим в студию целиком (React-узел не пересоздаём), при закрытии возвращаем на место. */
+    dockChat(tries = 0) {
       try {
-        const chat = document.querySelector('.room-chat-panel');
-        if (!chat || this.root.contains(chat)) return;
+        if (this.closing || this.chatNode) return;
+        const chat = document.querySelector('.in-game-room-chat .room-chat-panel') || document.querySelector('.room-chat-panel');
+        if (!chat) {
+          // чат свёрнут и не отрисован: нажимаем родную кнопку «Чат комнаты» и пробуем ещё раз
+          if (tries === 0) { const t = [...document.querySelectorAll('.in-game-room-chat-actions button')].find((b) => /чат|chat/i.test(b.textContent || '')); if (t) t.click(); }
+          if (tries < 8) setTimeout(() => this.dockChat(tries + 1), 150);
+          return;
+        }
+        if (this.root.contains(chat)) return;
         this.chatHome = document.createComment('vxp-room-chat');
         chat.replaceWith(this.chatHome);
         this.chatNode = chat;
