@@ -3,6 +3,11 @@
 Этот форк (**Voxalike+OrdaxEd**) основан на [Voxalike+](https://github.com/BeshkekArt/voxalike-plus) 1.3.0 (BeshkekArt, MIT).
 Ниже — то, что добавлено и изменено относительно оригинала. Записи самого оригинала сохранены под линией.
 
+## 1.34.0 — OrdaxEd
+
+### 🌹 Брендинг
+- В шапку студии и в панель на странице добавлен логотип совместного проекта **ROSE × ORDAX** (PNG с прозрачностью встроен как data URI в `src/vxp-main/brand-logo.js`, исходник — `src/vxp-brand-logo.png`).
+
 ## 1.33.0 — OrdaxEd
 
 ### 🎚 Обработка

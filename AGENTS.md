@@ -29,6 +29,7 @@ popup to check for updates.
 src/
   vxp-main/                  Main module source fragments
     bootstrap.js              Global VXP, utilities, settings, themes, event bus
+    brand-logo.js             ROSE × ORDAX logo as a data URI (source: src/vxp-brand-logo.png)
     audio-dsp.js              DSP, track rendering, EQ, dynamics, classic denoise
     game-audio.js             Game hooks, microphone, Web Audio, capture, player
     track-editor.js           Segment model and canvas track editor

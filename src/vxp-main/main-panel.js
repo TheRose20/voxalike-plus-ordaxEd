@@ -66,6 +66,8 @@
     widgets.add(wrap);
     return wrap;
   }
+  /** Логотип ROSE × ORDAX (картинка встроена в brand-logo.js). */
+  const brandLogo = (cls) => h('img', { class: 'vxp-rolo' + (cls ? ' ' + cls : ''), src: BRAND_LOGO, alt: 'ROSE × ORDAX', draggable: 'false' });
   function brandBar(small) {
     return h('div', { class: 'vxp-brand' + (small ? ' sm' : '') }, h('span', { class: 'vxp-logo' }), h('b', null, 'VOXALIKE+'), h('i', null, 'ORDAXED'), small ? null : h('span', { class: 'vxp-ver' }, 'v' + VERSION));
   }
@@ -80,6 +82,7 @@
     const fxPanel = fxControls(nativeTarget);
     const root = h('div', { class: 'vxp-panel', id: 'vxp-panel' },
       brandBar(false),
+      brandLogo('wide'),
       section('tracks', tr('Дорожки', 'Tracks'), editor.root, panel.bufInfo),
       section('fx', tr('Обработка звука', 'Sound processing'), fxPanel.main),
       section('space', tr('Пространство', 'Space'), fxPanel.space),

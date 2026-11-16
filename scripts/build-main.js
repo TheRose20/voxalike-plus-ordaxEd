@@ -15,6 +15,7 @@ const sourceDir = path.join(root, 'src', 'vxp-main');
 // Поэтому порядок здесь — часть контракта между ними.
 const files = [
   'bootstrap.js',
+  'brand-logo.js',
   'audio-dsp.js',
   'game-audio.js',
   'track-editor.js',

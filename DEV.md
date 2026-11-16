@@ -1,6 +1,7 @@
 # Разработка (форк Voxalike+OrdaxEd)
 
 Структура:
+- `src/vxp-brand-logo.png` — исходник логотипа (встроен в `src/vxp-main/brand-logo.js`)
 - `src/vxp-main/` — основной модуль, разделённый на смысловые фрагменты; их явный порядок склейки задан в `scripts/build-main.js`
 - `src/vxp-lobby.js`, `vxp-lobby.css` — расширение лобби; `vxp-lobby-sandbox.html` — полностью локальный макет выбора мода для правки CSS без подключения к Voxalike
 - `src/models/*.wasm` — модели шумоподавления (gtcrn, RNNoise); в `vxp-denoise.js` вставляются как base64 при сборке
