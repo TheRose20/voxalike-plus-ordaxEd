@@ -1254,11 +1254,39 @@ canvas.vxp-eqcv {
 @media (max-width:860px){.vxp-headl{width:150px}}
 .vxp-title .vxp-cnt{margin-left:auto;font-size:10px;font-weight:900;letter-spacing:.04em;color:var(--va2);border:1px solid rgba(var(--va3),.45);background:rgba(var(--va3),.1);border-radius:999px;padding:1px 9px;text-transform:none;cursor:default}
 
-/* ===== Чат комнаты внутри студии ===== */
-.vxp-chatslot:empty{display:none}
-.vxp-chatslot{min-width:0;height:300px;display:flex;flex-direction:column}
-.vxp-chatslot .room-chat-panel,.vxp-chatslot .room-chat-panel.fixed-chat{box-sizing:border-box;position:static!important;inset:auto!important;transform:none!important;width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;margin:0!important;display:flex!important;flex-direction:column;min-height:0;box-shadow:none!important;border:1px solid var(--vl2)!important;border-radius:11px!important;background:var(--v1)!important;overflow:hidden}
-.vxp-chatslot .room-chat-body{flex:1;min-height:0;display:grid;grid-template-rows:minmax(0,1fr) auto;overflow:hidden}
-.vxp-chatslot .room-chat-messages{min-height:0;overflow-y:auto}
-.vxp-chatslot .room-chat-message{user-select:text;-webkit-user-select:text}
+/* ===== Чат комнаты внутри студии: справа внизу, сворачивается в иконку, цвета берёт из темы ===== */
+.vxp-chatdock{position:absolute;right:26px;bottom:24px;z-index:5;display:none;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none}
+.vxp-chatdock.has{display:flex}
+.vxp-chatdock>*{pointer-events:auto}
+.vxp-chpanel{width:min(350px,calc(100vw - 40px));height:min(470px,calc(100vh - 150px));display:none;flex-direction:column;min-height:0;background:var(--vcard);border:1px solid rgba(var(--va3),.38);border-radius:16px;box-shadow:0 22px 60px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.4);overflow:hidden}
+.vxp-chatdock.open .vxp-chpanel{display:flex}
+.vxp-chhead{display:flex;align-items:center;gap:9px;padding:0 10px 0 14px;height:42px;flex:none;border-bottom:1px solid var(--vl);background:linear-gradient(180deg,rgba(var(--va3),.14),rgba(var(--va3),.03));color:var(--va2)}
+.vxp-chhead b{flex:1;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--vt);font-weight:900}
+.vxp-chhead .vxp-ic{width:17px;height:17px}
+.vxp-chmin{width:26px;height:26px;border-radius:8px;border:1px solid var(--vl2);background:var(--v2);color:var(--vt);font-size:16px;line-height:1;cursor:pointer;padding:0!important;min-height:0!important}
+.vxp-chmin:hover{border-color:var(--va);color:var(--va2)}
+.vxp-chfab{position:relative;width:50px;height:50px;border-radius:50%;border:1px solid rgba(var(--va3),.6);background:var(--vcard);color:var(--va2);display:grid;place-items:center;cursor:pointer;padding:0!important;min-height:0!important;box-shadow:0 8px 26px rgba(0,0,0,.55),0 0 18px rgba(var(--va3),.25);transition:transform .15s,box-shadow .15s}
+.vxp-chfab:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.6),0 0 24px rgba(var(--va3),.45)}
+.vxp-chfab .vxp-ic{width:24px;height:24px}
+.vxp-chatdock.open .vxp-chfab{background:rgba(var(--va3),.16)}
+.vxp-chbadge{position:absolute;top:-4px;right:-4px;min-width:19px;height:19px;border-radius:10px;padding:0 5px;background:var(--va);color:#0b0b0e;font:900 11px/19px system-ui,sans-serif;text-align:center;font-style:normal;display:none}
+.vxp-chfab.new .vxp-chbadge{display:block}
+.vxp-chatslot{flex:1;min-height:0;display:flex;flex-direction:column}
+.vxp-chatslot .room-chat-panel{box-sizing:border-box;position:static!important;inset:auto!important;transform:none!important;width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;margin:0!important;display:flex!important;flex-direction:column;min-height:0;box-shadow:none!important;border:0!important;border-radius:0!important;background:transparent!important;overflow:hidden}
+.vxp-chatslot .room-chat-label{display:none!important}
+.vxp-chatslot .room-chat-body{flex:1;min-height:0;display:grid!important;grid-template-rows:minmax(0,1fr) auto;overflow:hidden;background:transparent!important;border:0!important;padding:0!important}
+.vxp-chatslot .room-chat-messages{min-height:0;overflow-y:auto;padding:10px!important;display:flex!important;flex-direction:column;gap:7px!important;background:transparent!important;scrollbar-width:thin;scrollbar-color:rgba(var(--va3),.55) transparent}
+.vxp-chatslot .room-chat-messages::-webkit-scrollbar{width:8px}
+.vxp-chatslot .room-chat-messages::-webkit-scrollbar-thumb{background:rgba(var(--va3),.5);border-radius:6px}
+.vxp-chatslot .room-chat-message{user-select:text;-webkit-user-select:text;background:var(--v2)!important;border:1px solid var(--vl)!important;border-radius:11px!important;padding:8px 11px!important;margin:0!important;min-height:0!important;height:auto!important;color:var(--vt)!important;font-size:13px!important;line-height:1.35;box-shadow:none!important;flex:none}
+.vxp-chatslot .room-chat-message strong,.vxp-chatslot .room-chat-message b{color:var(--va2)!important}
+.vxp-chatslot .room-chat-message time,.vxp-chatslot .room-chat-message small,.vxp-chatslot .room-chat-message [class*="time"]{color:var(--vd)!important;font-size:10px!important;display:block;margin-top:3px}
 .vxp-chatslot .room-chat-error:empty{display:none}
+.vxp-chatslot .room-chat-compose{margin:0!important;padding:9px!important;border-top:1px solid var(--vl)!important;background:rgba(0,0,0,.18)!important;display:flex!important;gap:7px;align-items:center}
+.vxp-chatslot .room-chat-compose input{flex:1;min-width:0;height:38px;background:var(--v2)!important;border:1px solid var(--vl2)!important;border-radius:10px!important;color:var(--vt)!important;padding:0 11px!important;font-size:13px!important;outline:none!important}
+.vxp-chatslot .room-chat-compose input:focus{border-color:var(--va)!important;box-shadow:0 0 0 2px rgba(var(--va3),.2)!important}
+.vxp-chatslot .room-chat-compose input::placeholder{color:var(--vd)!important}
+.vxp-chatslot .room-chat-compose button{width:38px;height:38px;flex:none;border-radius:10px!important;border:1px solid rgba(var(--va3),.55)!important;background:rgba(var(--va3),.16)!important;color:var(--va2)!important;display:grid;place-items:center;padding:0!important;min-height:0!important}
+.vxp-chatslot .room-chat-compose button:disabled{opacity:.4}
+.vxp-chatslot .room-chat-compose button svg{width:18px;height:18px}
+@media (max-width:860px){.vxp-chatdock{right:12px;bottom:12px}}

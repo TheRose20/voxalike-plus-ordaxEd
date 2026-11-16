@@ -103,6 +103,14 @@
       this.navRow = h('div', { class: 'vxp-navrow' }, this.btnPrev, this.navMid, this.btnNext);
       this.list = h('div', { class: 'vxp-lines' });
       this.chatSlot = h('div', { class: 'vxp-chatslot' });
+      this.chatBadge = h('i', { class: 'vxp-chbadge' });
+      this.chatFab = h('button', { class: 'vxp-chfab', type: 'button', title: tr('Чат комнаты', 'Room chat'), 'aria-label': tr('Чат комнаты', 'Room chat'), onclick: () => this.toggleChat() }, svgIcon('chat'), this.chatBadge);
+      this.chatDock = h('div', { class: 'vxp-chatdock' + (settings.studioChat ? ' open' : '') },
+        h('div', { class: 'vxp-chpanel' },
+          h('div', { class: 'vxp-chhead' }, svgIcon('chat'), h('b', null, tr('Чат комнаты', 'Room chat')),
+            h('button', { class: 'vxp-chmin', type: 'button', title: tr('Свернуть', 'Collapse'), 'aria-label': tr('Свернуть', 'Collapse'), onclick: () => this.toggleChat(false) }, '–')),
+          this.chatSlot),
+        this.chatFab);
       const guide = checkbox({ label: tr('Слушать оригинал при записи', 'Hear the original while recording'), get: () => settings.studioGuide, set: (v) => { settings.studioGuide = v; saveSettings(); }, title: 'Нужны наушники' });
       const fx = fxControls(() => this.model ? { model: this.model, apply: () => { this.dirty = true; this.refreshEditor(); } } : null);
       this.root = h('div', { class: 'vxp-studio', role: 'dialog', 'aria-label': tr('Запись реплик заранее', 'Record lines in advance') },
@@ -112,7 +120,7 @@
             h('div', { class: 'vxp-row' },
               h('button', { class: 'vxp-btn icon', type: 'button', title: tr('Закрыть (Esc)', 'Close (Esc)'), onclick: () => this.close() }, '✕'))),
           h('div', { class: 'vxp-left' },
-            h('div', { class: 'vxp-sec' }, h('div', { class: 'vxp-title' }, h('span', null, tr('Мои реплики', 'My lines')), this.kicker), this.list), this.chatSlot),
+            h('div', { class: 'vxp-sec' }, h('div', { class: 'vxp-title' }, h('span', null, tr('Мои реплики', 'My lines')), this.kicker), this.list)),
           h('div', { class: 'vxp-stagebox' },
             this.navRow,
             this.videoBox,
@@ -135,6 +143,7 @@
               tr('Записанные реплики ждут в очереди и отправляются сами, как только подходит ваш ход. Очередь сохраняется на диск и переживает F5, но вкладку лучше не закрывать до конца игры.', 'Recorded lines wait in the queue and are sent automatically when your turn comes. The queue is kept on disk and survives F5, but keep the tab open until the game ends.'))))));
       this.keyHandler = (e) => this.onKey(e);
       this.doc.addEventListener('keydown', this.keyHandler, true);
+      this.root.append(this.chatDock);
       this.doc.body.append(this.root);
       if (!this.popup) this.dockChat();
       if (this.popup) {
@@ -158,7 +167,7 @@
         if (!chat) {
           // чат свёрнут и не отрисован: нажимаем родную кнопку «Чат комнаты» и пробуем ещё раз
           if (tries === 0) { const t = [...document.querySelectorAll('.in-game-room-chat-actions button')].find((b) => /чат|chat/i.test(b.textContent || '')); if (t) t.click(); }
-          if (tries < 8) setTimeout(() => this.dockChat(tries + 1), 150);
+          if (tries < 8) this.chatTimer = setTimeout(() => this.dockChat(tries + 1), 150);
           return;
         }
         if (this.root.contains(chat)) return;
@@ -167,14 +176,34 @@
         this.chatNode = chat;
         this.chatSlot.append(chat);
         if (!chat.classList.contains('open')) { const lb = chat.querySelector('.room-chat-label'); if (lb) lb.click(); }
+        this.chatDock.classList.add('has');
+        this.chatSeen = chat.querySelectorAll('.room-chat-message').length;
+        this.chatObs = new MutationObserver(() => this.chatUnread());
+        this.chatObs.observe(chat, { childList: true, subtree: true });
       } catch (e) { console.warn('[Voxalike+OrdaxEd] chat dock', e); }
     }
+    chatUnread() {
+      const n = this.chatNode ? this.chatNode.querySelectorAll('.room-chat-message').length : 0;
+      if (this.chatDock.classList.contains('open')) { this.chatSeen = n; this.chatBadge.textContent = ''; this.chatFab.classList.remove('new'); return; }
+      const u = Math.max(0, n - (this.chatSeen || 0));
+      this.chatBadge.textContent = u > 99 ? '99+' : u ? String(u) : '';
+      this.chatFab.classList.toggle('new', u > 0);
+    }
+    toggleChat(open) {
+      const on = open == null ? !this.chatDock.classList.contains('open') : open;
+      this.chatDock.classList.toggle('open', on);
+      settings.studioChat = on; saveSettings();
+      this.chatUnread();
+      if (on) { const m = this.chatNode && this.chatNode.querySelector('.room-chat-messages'); if (m) m.scrollTop = m.scrollHeight; }
+    }
     undockChat() {
+      clearTimeout(this.chatTimer);
+      try { this.chatObs && this.chatObs.disconnect(); } catch {}
       try {
         if (this.chatNode && this.chatHome && this.chatHome.parentNode) this.chatHome.replaceWith(this.chatNode);
         else if (this.chatNode) this.chatNode.remove();
       } catch {}
-      this.chatNode = null; this.chatHome = null;
+      this.chatNode = null; this.chatHome = null; this.chatObs = null;
     }
     close() {
       if (this.closing) return; this.closing = true;
