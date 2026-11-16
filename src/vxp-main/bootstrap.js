@@ -24,7 +24,7 @@
 (() => {
   'use strict';
   if (window.__VXP__) return;
-  const VERSION = '1.32.1';
+  const VERSION = '1.33.0';
   const VXP = (window.__VXP__ = { version: VERSION });
   const IS_FF = /firefox/i.test(navigator.userAgent);
 
@@ -101,6 +101,12 @@
     try { localStorage.setItem(SKEY, JSON.stringify(settings)); } catch {}
   }
   { const d = defFx(); if (!Array.isArray(settings.fx.eq) || settings.fx.eq.length !== 6) settings.fx.eq = d.eq; for (const k of ['comp', 'deess', 'lim', 'space']) settings.fx[k] = Object.assign(d[k], settings.fx[k] || {}); if (settings.fx.echo) { settings.fx.echo = false; settings.fx.space = { type: 'echo', mix: 40, size: 25 }; } }
+  if (!settings.flagsMig) { // кнопки «Срез низов» и «Под водой» убраны: срез низов переезжает в эквалайзер, «под водой» теперь пресет
+    settings.flagsMig = 1;
+    if (settings.fx.lowcut && !settings.fx.eq[0].on) Object.assign(settings.fx.eq[0], { on: true, f: 90, q: 0.71 });
+    settings.fx.lowcut = false; settings.fx.underwater = false;
+    try { localStorage.setItem(SKEY, JSON.stringify(settings)); } catch {}
+  }
   if (settings.collapsed.app === undefined) settings.collapsed.app = true;
   if (settings.collapsed.diag === undefined) settings.collapsed.diag = true;
   for (const k of ['st_rec', 'st_nr', 'st_set']) if (settings.collapsed[k] === undefined) settings.collapsed[k] = true;

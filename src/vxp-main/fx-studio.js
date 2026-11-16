@@ -49,6 +49,10 @@
       Object.assign(f.eq[0], { on: true, f: 420 }); Object.assign(f.eq[3], { on: true, f: 1700, g: 4, q: 1.1 }); Object.assign(f.eq[5], { on: true, type: 'lp', f: 3400, q: 0.8 });
       Object.assign(f.comp, { on: true, thr: -20, ratio: 6, att: 4, rel: 90, knee: 4, makeup: 6 }); Object.assign(f.lim, { on: true, ceil: -1, gain: 3 });
     }],
+    ['lowcut', tr('Срез низов', 'Low cut'), (f) => { Object.assign(f.eq[0], { on: true, f: 90, q: 0.71 }); }],
+    ['underwater', tr('Под водой', 'Underwater'), (f) => {
+      Object.assign(f.eq[0], { on: true, f: 120, q: 0.71 }); Object.assign(f.eq[4], { on: true, f: 1800, g: -5, q: 0.7 }); Object.assign(f.eq[5], { on: true, type: 'lp', f: 800, q: 0.9 });
+    }],
     ['deess', tr('Только дэ-эссер', 'De-esser only'), (f) => { Object.assign(f.deess, { on: true, f: 6800, thr: -36, amt: 9 }); }],
   ];
 
