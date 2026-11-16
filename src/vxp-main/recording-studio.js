@@ -94,21 +94,47 @@
       this.editor.onMarker = () => this.updateButtons();
       this.btnSave = h('button', { class: 'vxp-btn primary wide big', title: tr('Отправить в очередь и перейти к следующей реплике (Enter)', 'Queue it and go to the next line (Enter)'), type: 'button', onclick: () => this.save(true) }, tr('✓ Сохранить → далее', '✓ Save → next'));
       this.btnDel = h('button', { class: 'vxp-btn', type: 'button', title: tr('Удалить из очереди', 'Remove from queue'), onclick: () => this.remove() }, '🗑');
-      // нижняя часть студии: панель инструментов над волной, транспорт под ней (только в студии, панель на странице не меняется)
-      { const ed = this.editor, play = ed.btnPlay;
-        this.timeEl = h('span', { class: 'vxp-time' }, '0:00.00 / 0:00.00');
-        play.classList.add('vxp-tplay'); play.setAttribute('data-cap', tr('вместе', 'together'));
-        ed.setPlaying = (p) => { play.replaceChildren(svgIcon(p ? 'stop' : 'play')); play.classList.toggle('playing', !!p); play.setAttribute('aria-label', p ? tr('Стоп', 'Stop') : tr('Играть оригинал и мою запись вместе', 'Play original and my take together')); };
+      // нижняя часть студии по референсу (только студия: редактор на странице не меняется)
+      { const ed = this.editor, btn = (cls, ic, txt, title, fn) => h('button', { class: 'vxp-btn ' + cls, type: 'button', title, onclick: fn }, ic ? svgIcon(ic) : null, txt || null);
+        this.timeEl = h('span', { class: 'vxp-time' }, '0:00.0 / 0:00.0');
+        ed.hideTags = true; this.src = 'mine';
+        this.laneO = h('button', { class: 'vxp-lane o', type: 'button', onclick: () => this.setSrc('orig') }, h('i'), tr('Оригинал', 'Original'));
+        this.laneM = h('button', { class: 'vxp-lane m on', type: 'button', onclick: () => this.setSrc('mine') }, h('i'), tr('Моя запись', 'My take'));
+        // скрытые носители логики: кнопки «Оригинал» и «Моя запись» продолжают управлять воспроизведением
+        this.btnOrig.style.display = 'none'; this.btnMine.style.display = 'none';
+        this.tPlay = h('button', { class: 'vxp-btn vxp-tplay', type: 'button', onclick: () => (this.src === 'orig' ? this.btnOrig : this.btnMine).click() });
+        const syncPlay = () => {
+          const stop = /■/.test(this.btnOrig.textContent + this.btnMine.textContent);
+          this.tPlay.replaceChildren(svgIcon(stop ? 'stop' : 'play')); this.tPlay.classList.toggle('playing', stop);
+          this.tPlay.disabled = (this.src === 'orig' ? this.btnOrig : this.btnMine).disabled && !stop;
+          this.tPlay.title = this.src === 'orig' ? tr('Играть оригинал', 'Play the original') : tr('Играть мою запись', 'Play my take');
+        };
+        this.syncPlay = syncPlay;
+        new MutationObserver(syncPlay).observe(this.btnOrig, { childList: true, characterData: true, subtree: true, attributes: true });
+        new MutationObserver(syncPlay).observe(this.btnMine, { childList: true, characterData: true, subtree: true, attributes: true });
+        syncPlay();
+        ed.btnCut.className = 'vxp-btn vxp-tb'; ed.btnCut.replaceChildren(svgIcon('cut'), tr('Обрезать', 'Cut')); ed.btnCut.onclick = () => ed.setTool(ed.tool === 'cut' ? 'move' : 'cut');
+        ed.btnDel.className = 'vxp-btn vxp-tb'; ed.btnDel.replaceChildren(svgIcon('trash'), tr('Удалить', 'Delete'));
+        ed.btnUndo.className = 'vxp-btn vxp-tb ico'; ed.btnUndo.replaceChildren(svgIcon('undo'));
+        ed.btnReset.className = 'vxp-btn vxp-tb ico'; ed.btnReset.replaceChildren(svgIcon('reset'));
+        ed.btnAuto.className = 'vxp-btn vxp-tb'; ed.btnAuto.replaceChildren(svgIcon('sync'), tr('Авто', 'Auto'));
+        const bp = ed.btnPlay; bp.className = 'vxp-btn vxp-tb'; bp.title = tr('Оригинал и моя запись вместе', 'Original and my take together');
+        ed.setPlaying = (p) => bp.replaceChildren(svgIcon(p ? 'stop' : 'phones'), p ? tr('Стоп', 'Stop') : tr('Слушать вместе', 'Listen together'));
         ed.setPlaying(false);
+        const toStart = btn('vxp-tb ico', 'skipb', '', tr('Метку в начало', 'Marker to start'), () => { ed.marker = 0; ed.draw(); ed.onMarker && ed.onMarker(); });
+        const toEnd = btn('vxp-tb ico', 'skipf', '', tr('Метку в конец', 'Marker to end'), () => { ed.marker = this.clip ? this.clipDur() : 0; ed.draw(); ed.onMarker && ed.onMarker(); });
+        this.nudgePop = h('div', { class: 'vxp-nudgepop' }, h('div', { class: 'vxp-tgrp' }, ed.btnNudgeL, ed.label, ed.btnNudgeR), ed.playOpts);
+        const gear = btn('vxp-tb ico', 'cog', '', tr('Сдвиг, зацикливание, воспроизведение с метки', 'Shift, loop, play from marker'), () => this.nudgePop.classList.toggle('open'));
+        this.doc.addEventListener('mousedown', (e) => { if (this.nudgePop.classList.contains('open') && !e.target.closest('.vxp-nudgewrap')) this.nudgePop.classList.remove('open'); }, true);
         const draw0 = ed.draw.bind(ed); ed.draw = () => { draw0(); this.updateTime(); };
-        this.btnOrig.classList.add('vxp-tpill'); this.btnMine.classList.add('vxp-tpill');
         ed.root.replaceChildren(
-          h('div', { class: 'vxp-toolsbar' }, ed.rowTools, this.timeEl),
-          ed.canvas,
+          h('div', { class: 'vxp-wavebox' }, ed.canvas, this.laneO, this.laneM, this.timeEl),
           h('div', { class: 'vxp-transport' },
-            h('div', { class: 'vxp-tgrp' }, ed.btnAuto, ed.btnNudgeL, ed.label, ed.btnNudgeR),
-            h('div', { class: 'vxp-tgrp mid' }, this.btnOrig, play, this.btnMine),
-            ed.playOpts)); }
+            h('div', { class: 'vxp-tgrp' }, ed.btnCut, ed.btnDel, ed.btnUndo, ed.btnReset),
+            h('i', { class: 'vxp-sep' }),
+            h('div', { class: 'vxp-tgrp' }, toStart, this.tPlay, toEnd),
+            h('i', { class: 'vxp-sep' }),
+            h('div', { class: 'vxp-tgrp' }, ed.btnAuto, bp, h('div', { class: 'vxp-nudgewrap' }, gear, this.nudgePop)))); }
       this.title = h('h3'); this.kicker = h('small', { class: 'vxp-cnt', title: tr('Записано реплик из всех ваших', 'Lines recorded out of all yours') });
       this.stepEls = [tr('Запиши', 'Record'), tr('Послушай', 'Listen'), tr('Сохрани', 'Save')].map((t, i) => h('div', { class: 'vxp-step' }, h('b', null, String(i + 1)), t));
       this.steps = h('div', { class: 'vxp-steps' }, ...this.stepEls);
@@ -296,9 +322,13 @@
         return c == null ? '' : typeof c === 'string' ? c : c.name || c.title || '';
       }).filter(Boolean).join(' · ');
     }
+    setSrc(k) {
+      this.src = k; this.laneO.classList.toggle('on', k === 'orig'); this.laneM.classList.toggle('on', k === 'mine');
+      this.syncPlay && this.syncPlay();
+    }
     updateTime() {
       try {
-        const ed = this.editor, f = (t) => { t = Math.max(0, t || 0); const m = Math.floor(t / 60); return m + ':' + (t - m * 60).toFixed(2).padStart(5, '0'); };
+        const ed = this.editor, f = (t) => { t = Math.max(0, t || 0); const m = Math.floor(t / 60); return m + ':' + (t - m * 60).toFixed(1).padStart(4, '0'); };
         this.timeEl.textContent = f(ed.playhead != null ? ed.playhead : ed.marker != null ? ed.marker : 0) + ' / ' + f(this.clip ? this.clipDur() : 0);
       } catch {}
     }

@@ -309,6 +309,7 @@
         return [a0, a1];
       };
       const tag = (y0, name, color) => {
+        if (this.hideTags) return;
         g.font = '900 9px Nunito Variable, system-ui, sans-serif';
         g.fillStyle = 'rgba(5,8,14,.78)'; g.fillRect(3, y0 + 3, g.measureText(name).width + 10, 14);
         g.fillStyle = color; g.fillText(name, 8, y0 + 13);
@@ -344,7 +345,7 @@
         winEnd = m.outLen / m.sr;
         tag(y2, tr('МОЯ', 'MINE') + (m.segs.length > 1 ? ' · ' + m.segs.length + ' ' + tr('кус.', 'pcs') : '') + (m.params.offset ? ' ' + fmtMs(m.params.offset) : ''), THEME.mine);
       } else {
-        g.fillStyle = 'rgba(247,247,255,.28)'; g.font = '700 10px Nunito Variable, system-ui, sans-serif'; g.fillText(tr('Нет записи', 'No recording'), 8, y2 + laneH / 2 + 3);
+        g.fillStyle = 'rgba(247,247,255,.28)'; g.font = '700 10px Nunito Variable, system-ui, sans-serif'; g.fillText(tr('Не записано', 'Not recorded'), 8, y2 + laneH / 2 + 3);
         tag(y2, tr('МОЯ', 'MINE'), THEME.mine);
       }
       // окно, которое уходит в игру
@@ -361,7 +362,11 @@
         g.strokeStyle = '#f7f7ff'; g.lineWidth = 1; g.setLineDash([3, 3]);
         g.beginPath(); g.moveTo(X, y2); g.lineTo(X, y2 + laneH); g.stroke(); g.setLineDash([]);
       }
-      if (this.playhead != null) { g.fillStyle = '#f7f7ff'; g.fillRect(Math.round(x(this.playhead)), ruler, 1.5, H - ruler); }
+      if (this.playhead != null) {
+        const px = Math.round(x(this.playhead));
+        g.fillStyle = THEME.acc; g.fillRect(px, 6, 2, H - 6);
+        g.beginPath(); g.arc(px + 1, 6, 4.5, 0, Math.PI * 2); g.fill();
+      }
       if (this.marker != null && m) {
         const mx = Math.round(x(this.marker));
         g.save(); g.strokeStyle = THEME.acc; g.fillStyle = THEME.acc; g.lineWidth = 1.5; g.setLineDash([4, 3]);
