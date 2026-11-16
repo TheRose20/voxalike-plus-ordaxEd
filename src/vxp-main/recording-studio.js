@@ -368,7 +368,7 @@
         this.btnRerecord.textContent = tr('■ Стоп', '■ Stop');
         this.btnRerecord.disabled = true;
       } else {
-        this.btnRecord.textContent = this.model ? tr('➕ Запись с метки', '➕ Record at marker') : tr('● Записать', '● Record');
+        this.btnRecord.textContent = this.model ? tr('● Запись с метки', '● Record at marker') : tr('● Записать', '● Record');
         this.btnRecord.disabled = busy || this.counting;
         this.btnRerecord.textContent = this.rerecPending ? tr('⚠ Точно перезаписать?', '⚠ Really re-record?') : tr('⟲ Перезаписать', '⟲ Re-record');
         this.btnRerecord.classList.toggle('ask', !!this.rerecPending);
@@ -543,8 +543,15 @@
         initSegs(this.model);
         this.dirty = true;
         this.refreshEditor();
+        this.markEnd(this.model.t0 + res.samples.length / res.sr);
         try { this.video.currentTime = this.clip.videoStartSeconds; } catch {}
       });
+    }
+    /** По окончании записи метка сама встаёт в конец записанного (не дальше конца реплики) — следующая дозапись продолжит оттуда. */
+    markEnd(t) {
+      const ed = this.editor; if (!this.model) return;
+      ed.marker = Math.max(0, Math.min(t, this.clipDur()));
+      ed.draw(); ed.onMarker && ed.onMarker();
     }
     punchMerge(res, rec) {
       const m = this.model, ed = this.editor, sr = m.sr;
@@ -566,6 +573,7 @@
       ed.sel.clear(); ed.sel.add(seg.id);
       this.dirty = true;
       this.refreshEditor();
+      this.markEnd(pos + dur);
       toast(tr('Дозапись вставлена в дубль', 'Punch-in added to the take'));
       try { this.video.currentTime = this.clip.videoStartSeconds; } catch {}
     }
