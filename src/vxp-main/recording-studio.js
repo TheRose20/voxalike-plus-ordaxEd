@@ -88,27 +88,12 @@
       this.btnMine = h('button', { class: 'vxp-btn', type: 'button', onclick: () => this.playMine(false) }, tr('▶ Моя запись', '▶ My take'));
       
       this.punchInfo = h('span', { class: 'vxp-hint', style: 'align-self:center' });
-      this.punchRow = h('div', { class: 'vxp-punch' }, h('div', { class: 'vxp-recpair' }, this.btnRecord, this.btnRerecord),
-        h('div', { class: 'vxp-punchopt' }, this.punchInfo, checkbox({ label: tr('Заменять то, что под записью', 'Replace what is under the recording'), get: () => settings.punchReplace, set: (v) => { settings.punchReplace = v; saveSettings(); }, title: tr('Вкл — старый звук под новым куском вырезается; выкл — новый кусок накладывается сверху', 'On — the old sound under the new piece is cut out; off — the new piece is layered on top') })));
+      this.punchRow = h('div', { class: 'vxp-row', style: 'align-items:center;flex-wrap:wrap;justify-content:center' }, this.btnRecord, this.btnRerecord, this.punchInfo,
+        checkbox({ label: tr('Заменять то, что под записью', 'Replace what is under the recording'), get: () => settings.punchReplace, set: (v) => { settings.punchReplace = v; saveSettings(); }, title: tr('Вкл — старый звук под новым куском вырезается; выкл — новый кусок накладывается сверху', 'On — the old sound under the new piece is cut out; off — the new piece is layered on top') }));
       
       this.editor.onMarker = () => this.updateButtons();
       this.btnSave = h('button', { class: 'vxp-btn primary wide big', title: tr('Отправить в очередь и перейти к следующей реплике (Enter)', 'Queue it and go to the next line (Enter)'), type: 'button', onclick: () => this.save(true) }, tr('✓ Сохранить → далее', '✓ Save → next'));
       this.btnDel = h('button', { class: 'vxp-btn', type: 'button', title: tr('Удалить из очереди', 'Remove from queue'), onclick: () => this.remove() }, '🗑');
-      // нижняя часть студии: панель инструментов над волной, транспорт под ней (только в студии, панель на странице не меняется)
-      { const ed = this.editor, play = ed.btnPlay;
-        this.timeEl = h('span', { class: 'vxp-time' }, '0:00.00 / 0:00.00');
-        play.classList.add('vxp-tplay'); play.setAttribute('data-cap', tr('вместе', 'together'));
-        ed.setPlaying = (p) => { play.replaceChildren(svgIcon(p ? 'stop' : 'play')); play.classList.toggle('playing', !!p); play.setAttribute('aria-label', p ? tr('Стоп', 'Stop') : tr('Играть оригинал и мою запись вместе', 'Play original and my take together')); };
-        ed.setPlaying(false);
-        const draw0 = ed.draw.bind(ed); ed.draw = () => { draw0(); this.updateTime(); };
-        this.btnOrig.classList.add('vxp-tpill'); this.btnMine.classList.add('vxp-tpill');
-        ed.root.replaceChildren(
-          h('div', { class: 'vxp-toolsbar' }, ed.rowTools, this.timeEl),
-          ed.canvas,
-          h('div', { class: 'vxp-transport' },
-            h('div', { class: 'vxp-tgrp' }, ed.btnAuto, ed.btnNudgeL, ed.label, ed.btnNudgeR),
-            h('div', { class: 'vxp-tgrp mid' }, this.btnOrig, play, this.btnMine),
-            ed.playOpts)); }
       this.title = h('h3'); this.kicker = h('small', { class: 'vxp-cnt', title: tr('Записано реплик из всех ваших', 'Lines recorded out of all yours') });
       this.stepEls = [tr('Запиши', 'Record'), tr('Послушай', 'Listen'), tr('Сохрани', 'Save')].map((t, i) => h('div', { class: 'vxp-step' }, h('b', null, String(i + 1)), t));
       this.steps = h('div', { class: 'vxp-steps' }, ...this.stepEls);
@@ -141,9 +126,10 @@
             this.videoBox,
             h('div', { class: 'vxp-sub' }, this.subSpeaker, this.subText),
             this.editor.root,
+            h('div', { class: 'vxp-row' }, this.btnOrig, this.btnMine),
             this.punchRow,
-            h('div', { class: 'vxp-saverow' }, this.btnSave, this.btnDel),
-            h('details', { class: 'vxp-keys' }, h('summary', null, svgIcon('keys'), tr('Горячие клавиши', 'Hotkeys')), h('p', null, tr('Клавиши: R — запись/стоп · Shift+R — перезапись · Пробел — моя запись · Enter — сохранить и далее · [ ] — сдвиг · A — авто · Esc — закрыть', 'Keys: R — record/stop · Shift+R — re-record · Space — my take · Enter — save and next · [ ] — shift · A — auto · Esc — close')))),
+            h('div', { class: 'vxp-row' }, this.btnSave, this.btnDel),
+            h('div', { class: 'vxp-hint', title: tr('Горячие клавиши', 'Hotkeys') }, tr('Клавиши: R — запись/стоп · Shift+R — перезапись · Пробел — моя запись · Enter — сохранить и далее · [ ] — сдвиг · A — авто · Esc — закрыть', 'Keys: R — record/stop · Shift+R — re-record · Space — my take · Enter — save and next · [ ] — shift · A — auto · Esc — close'))),
           h('div', { class: 'vxp-side' },
             h('div', { class: 'vxp-sec' }, h('div', { class: 'vxp-title' }, h('span', null, tr('Обработка звука', 'Sound processing'))), fx.main),
             studioSec('space', tr('Пространство', 'Space'), fx.space),
@@ -295,12 +281,6 @@
         const c = ch[+sp] ?? ch.find((x) => x && x.id === sp);
         return c == null ? '' : typeof c === 'string' ? c : c.name || c.title || '';
       }).filter(Boolean).join(' · ');
-    }
-    updateTime() {
-      try {
-        const ed = this.editor, f = (t) => { t = Math.max(0, t || 0); const m = Math.floor(t / 60); return m + ':' + (t - m * 60).toFixed(2).padStart(5, '0'); };
-        this.timeEl.textContent = f(ed.playhead != null ? ed.playhead : ed.marker != null ? ed.marker : 0) + ' / ' + f(this.clip ? this.clipDur() : 0);
-      } catch {}
     }
     clipDur() { return Math.max(0.5, this.ref ? this.ref.duration : (this.clip.videoEndSeconds - this.clip.videoStartSeconds) || 3); }
     updateButtons() {

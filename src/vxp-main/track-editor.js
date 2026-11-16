@@ -22,13 +22,13 @@
         checkbox({ label: tr('Зацикливание', 'Loop'), get: () => settings.loopPlay, set: (v) => { settings.loopPlay = v; saveSettings(); }, title: tr('По окончании отрезка проигрывать заново', 'Start playing again when the section ends') }),
         checkbox({ label: tr('Играть с метки', 'Play from marker'), get: () => settings.playFromMarker, set: (v) => { settings.playFromMarker = v; saveSettings(); }, title: tr('Все кнопки воспроизведения начинают с метки (метка — клик по линейке времени над дорожкой)', 'All play buttons start at the marker (set it by clicking the time ruler above the track)') }));
       this.toolbar = h('div', { class: 'vxp-editbar' },
-        (this.rowTools = h('div', { class: 'vxp-row vxp-tools' }, this.btnMove, this.btnCut, this.btnDel, this.btnUndo, this.btnReset, this.btnFix)),
-        (this.rowNudge = h('div', { class: 'vxp-row vxp-tools' },
-          (this.btnNudgeL = B('◀', tr('Сдвинуть влево (−10 мс, Shift −50). Если выбраны куски — только их', 'Shift left (−10 ms, Shift −50). With pieces selected — only them'), (e) => this.nudge(e.shiftKey ? -50 : -10))),
+        h('div', { class: 'vxp-row vxp-tools' }, this.btnMove, this.btnCut, this.btnDel, this.btnUndo, this.btnReset, this.btnFix),
+        h('div', { class: 'vxp-row vxp-tools' },
+          B('◀', tr('Сдвинуть влево (−10 мс, Shift −50). Если выбраны куски — только их', 'Shift left (−10 ms, Shift −50). With pieces selected — only them'), (e) => this.nudge(e.shiftKey ? -50 : -10)),
           this.label,
-          (this.btnNudgeR = B('▶', tr('Сдвинуть вправо (+10 мс, Shift +50). Если выбраны куски — только их', 'Shift right (+10 ms, Shift +50). With pieces selected — only them'), (e) => this.nudge(e.shiftKey ? 50 : 10))),
-          (this.btnAuto = B(tr('Авто', 'Auto'), tr('Автоподгонка к оригиналу', 'Auto-align to the original'), () => this.auto(), '')),
-          this.btnPlay)),
+          B('▶', tr('Сдвинуть вправо (+10 мс, Shift +50). Если выбраны куски — только их', 'Shift right (+10 ms, Shift +50). With pieces selected — only them'), (e) => this.nudge(e.shiftKey ? 50 : 10)),
+          B(tr('Авто', 'Auto'), tr('Автоподгонка к оригиналу', 'Auto-align to the original'), () => this.auto(), ''),
+          this.btnPlay),
         this.playOpts);
       this.root = h('div', { class: 'vxp-editor' }, this.canvas, this.toolbar);
       this.bindPointer();

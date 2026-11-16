@@ -1294,37 +1294,3 @@ canvas.vxp-eqcv {
 .vxp-chatslot .room-chat-compose button:disabled{opacity:.4}
 .vxp-chatslot .room-chat-compose button svg{width:18px;height:18px}
 @media (max-width:860px){.vxp-chatdock{right:12px;bottom:12px}}
-
-/* ===== Студия: нижняя часть по референсу (панель инструментов, транспорт, запись, сохранение) ===== */
-.vxp-studio .vxp-editor{gap:10px}
-.vxp-toolsbar{display:flex;align-items:center;gap:10px;min-width:0}
-.vxp-toolsbar .vxp-tools{flex:0 1 auto;justify-content:flex-start;gap:6px;padding:4px;border:1px solid var(--vl);border-radius:12px;background:var(--v1)}
-.vxp-toolsbar .vxp-btn.icon{width:32px;height:32px;min-height:0!important;padding:0!important;border-radius:9px}
-.vxp-time{margin-left:auto;font-size:12px;font-weight:800;color:var(--vd);font-variant-numeric:tabular-nums;letter-spacing:.02em;white-space:nowrap}
-.vxp-transport{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--vl);border-radius:14px;background:var(--v1)}
-.vxp-tgrp{display:flex;align-items:center;gap:6px;min-width:0}
-.vxp-tgrp.mid{justify-content:center;gap:12px}
-.vxp-transport .vxp-offset{min-width:70px}
-.vxp-transport .vxp-btn{min-height:0!important}
-.vxp-tpill{height:38px;padding:0 16px!important;border-radius:11px!important;white-space:nowrap}
-.vxp-tplay{position:relative;width:58px!important;height:58px!important;border-radius:50%!important;padding:0!important;display:grid;place-items:center;border:2px solid var(--va)!important;background:rgba(var(--va3),.12)!important;color:var(--va2)!important;box-shadow:0 0 18px rgba(var(--va3),.28);margin-bottom:12px}
-.vxp-tplay::after{content:attr(data-cap);position:absolute;left:50%;bottom:-16px;transform:translateX(-50%);font-size:10px;font-weight:800;letter-spacing:.05em;color:var(--vd);text-transform:uppercase;white-space:nowrap}
-.vxp-tplay:hover{background:rgba(var(--va3),.22)!important}
-.vxp-tplay.playing{background:var(--va)!important;color:#0b0b0e!important}
-.vxp-tplay .vxp-ic{width:26px;height:26px;fill:currentColor;stroke:none}
-.vxp-transport .vxp-playopts{grid-column:1/-1;justify-content:center;gap:6px 22px}
-.vxp-punch{display:grid;gap:8px}
-.vxp-recpair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.vxp-recpair .vxp-btn{width:100%;margin:0}
-.vxp-punchopt{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.vxp-saverow{display:grid;grid-template-columns:1fr 46px;gap:10px;align-items:stretch}
-.vxp-saverow .vxp-btn{margin:0;width:auto}
-.vxp-saverow .vxp-btn:last-child{padding:0!important}
-.vxp-keys{font-size:11px;color:var(--vd)}
-.vxp-keys summary{cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-weight:800;list-style:none;padding:4px 10px;border:1px solid var(--vl);border-radius:999px}
-.vxp-keys summary::-webkit-details-marker{display:none}
-.vxp-keys summary:hover{border-color:var(--va);color:var(--va2)}
-.vxp-keys .vxp-ic{width:14px;height:14px}
-.vxp-keys p{margin:8px 0 0;line-height:1.5}
-@media (max-width:720px){.vxp-transport{grid-template-columns:1fr}.vxp-tgrp{justify-content:center}}
-.vxp-tplay .vxp-ic path{fill:currentColor!important;stroke:none!important}
