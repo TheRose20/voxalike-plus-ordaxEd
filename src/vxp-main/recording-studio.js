@@ -102,6 +102,7 @@
       this.navMid = h('div', { class: 'vxp-navmid' });
       this.navRow = h('div', { class: 'vxp-navrow' }, this.btnPrev, this.navMid, this.btnNext);
       this.list = h('div', { class: 'vxp-lines' });
+      this.chatSlot = h('div', { class: 'vxp-chatslot' });
       const guide = checkbox({ label: tr('Слушать оригинал при записи', 'Hear the original while recording'), get: () => settings.studioGuide, set: (v) => { settings.studioGuide = v; saveSettings(); }, title: 'Нужны наушники' });
       const fx = fxControls(() => this.model ? { model: this.model, apply: () => { this.dirty = true; this.refreshEditor(); } } : null);
       this.root = h('div', { class: 'vxp-studio', role: 'dialog', 'aria-label': tr('Запись реплик заранее', 'Record lines in advance') },
@@ -111,7 +112,7 @@
             h('div', { class: 'vxp-row' },
               h('button', { class: 'vxp-btn icon', type: 'button', title: tr('Закрыть (Esc)', 'Close (Esc)'), onclick: () => this.close() }, '✕'))),
           h('div', { class: 'vxp-left' },
-            h('div', { class: 'vxp-sec' }, h('div', { class: 'vxp-title' }, h('span', null, tr('Мои реплики', 'My lines')), this.kicker), this.list)),
+            h('div', { class: 'vxp-sec' }, h('div', { class: 'vxp-title' }, h('span', null, tr('Мои реплики', 'My lines')), this.kicker), this.list), this.chatSlot),
           h('div', { class: 'vxp-stagebox' },
             this.navRow,
             this.videoBox,
@@ -135,6 +136,7 @@
       this.keyHandler = (e) => this.onKey(e);
       this.doc.addEventListener('keydown', this.keyHandler, true);
       this.doc.body.append(this.root);
+      if (!this.popup) this.dockChat();
       if (this.popup) {
         this.themeSync = setInterval(() => { try { const a = qs('#vxp-theme'), b = this.doc.getElementById('vxp-theme'); if (a && b && b.textContent !== a.textContent) b.textContent = a.textContent; } catch {} }, 400);
         this.popup.addEventListener('pagehide', () => { if (studio === this && !this.closing) this.close(); });
@@ -148,12 +150,32 @@
       this.close();
       openStudio(idx, { popout });
     }
+    /** Родной чат комнаты Voxalike переносим в студию целиком (React-узел не пересоздаём), при закрытии возвращаем на место. */
+    dockChat() {
+      try {
+        const chat = document.querySelector('.room-chat-panel');
+        if (!chat || this.root.contains(chat)) return;
+        this.chatHome = document.createComment('vxp-room-chat');
+        chat.replaceWith(this.chatHome);
+        this.chatNode = chat;
+        this.chatSlot.append(chat);
+        if (!chat.classList.contains('open')) { const lb = chat.querySelector('.room-chat-label'); if (lb) lb.click(); }
+      } catch (e) { console.warn('[Voxalike+OrdaxEd] chat dock', e); }
+    }
+    undockChat() {
+      try {
+        if (this.chatNode && this.chatHome && this.chatHome.parentNode) this.chatHome.replaceWith(this.chatNode);
+        else if (this.chatNode) this.chatNode.remove();
+      } catch {}
+      this.chatNode = null; this.chatHome = null;
+    }
     close() {
       if (this.closing) return; this.closing = true;
       this.stopRec(true); player.stop();
       this.saving = false; this.starting = false;
       clearInterval(this.themeSync);
       this.doc.removeEventListener('keydown', this.keyHandler, true);
+      this.undockChat();
       this.root.remove();
       if (studio === this) studio = null;
       if (!studio) quietOff();
