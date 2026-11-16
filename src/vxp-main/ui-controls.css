@@ -1239,3 +1239,4 @@ canvas.vxp-eqcv {
 .vxp-rolo.head{width:100%;height:auto}
 @media (max-width:1260px){.vxp-headl{width:200px}}
 @media (max-width:860px){.vxp-headl{width:150px}}
+.vxp-title .vxp-cnt{margin-left:auto;font-size:10px;font-weight:900;letter-spacing:.04em;color:var(--va2);border:1px solid rgba(var(--va3),.45);background:rgba(var(--va3),.1);border-radius:999px;padding:1px 9px;text-transform:none;cursor:default}

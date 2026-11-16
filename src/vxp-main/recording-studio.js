@@ -94,7 +94,7 @@
       this.editor.onMarker = () => this.updateButtons();
       this.btnSave = h('button', { class: 'vxp-btn primary wide big', title: tr('Отправить в очередь и перейти к следующей реплике (Enter)', 'Queue it and go to the next line (Enter)'), type: 'button', onclick: () => this.save(true) }, tr('✓ Сохранить → далее', '✓ Save → next'));
       this.btnDel = h('button', { class: 'vxp-btn', type: 'button', title: tr('Удалить из очереди', 'Remove from queue'), onclick: () => this.remove() }, '🗑');
-      this.title = h('h3'); this.kicker = h('small');
+      this.title = h('h3'); this.kicker = h('small', { class: 'vxp-cnt', title: tr('Записано реплик из всех ваших', 'Lines recorded out of all yours') });
       this.stepEls = [tr('Запиши', 'Record'), tr('Послушай', 'Listen'), tr('Сохрани', 'Save')].map((t, i) => h('div', { class: 'vxp-step' }, h('b', null, String(i + 1)), t));
       this.steps = h('div', { class: 'vxp-steps' }, ...this.stepEls);
       this.btnPrev = h('button', { class: 'vxp-btn', type: 'button', title: tr('Предыдущая моя реплика', 'Previous line of mine'), onclick: () => this.go(-1) }, tr('◀ Назад', '◀ Prev'));
@@ -111,7 +111,7 @@
             h('div', { class: 'vxp-row' },
               h('button', { class: 'vxp-btn icon', type: 'button', title: tr('Закрыть (Esc)', 'Close (Esc)'), onclick: () => this.close() }, '✕'))),
           h('div', { class: 'vxp-left' },
-            h('div', { class: 'vxp-sec' }, h('div', { class: 'vxp-title' }, h('span', null, tr('Мои реплики', 'My lines'))), this.list)),
+            h('div', { class: 'vxp-sec' }, h('div', { class: 'vxp-title' }, h('span', null, tr('Мои реплики', 'My lines')), this.kicker), this.list)),
           h('div', { class: 'vxp-stagebox' },
             this.navRow,
             this.videoBox,
@@ -186,7 +186,7 @@
           h('span', { class: 'n' }, '#' + (a.index + 1)), h('span', { class: 'c' }, a.caption || a.clipId), h('span', { class: 'vxp-chip ' + st }, statusText(st)));
       }));
       const done = mine.filter((a) => ['sent', 'ready'].includes(lineStatus(g, a))).length;
-      this.kicker.textContent = tr('Запись заранее · готово ', 'Recording ahead · done ') + done + '/' + mine.length;
+      this.kicker.textContent = done + ' / ' + mine.length;
     }
     refreshEditor() { this.editor.set(this.ref, this.model); this.updateButtons(); }
     async select(index) {
