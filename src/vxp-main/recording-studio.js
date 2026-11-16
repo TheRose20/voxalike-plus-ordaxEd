@@ -107,7 +107,7 @@
       this.root = h('div', { class: 'vxp-studio', role: 'dialog', 'aria-label': tr('Запись реплик заранее', 'Record lines in advance') },
         h('div', { class: 'vxp-card' },
           h('div', { class: 'vxp-card-head' },
-            h('div', { class: 'vxp-headl' }, brandLogo('head'), h('div', null, brandBar(true), this.kicker, this.title)),
+            h('div', { class: 'vxp-headl' }, brandLogo('head')),
             h('div', { class: 'vxp-row' },
               h('button', { class: 'vxp-btn icon', type: 'button', title: tr('Закрыть (Esc)', 'Close (Esc)'), onclick: () => this.close() }, '✕'))),
           h('div', { class: 'vxp-left' },

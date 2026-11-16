@@ -1235,6 +1235,7 @@ canvas.vxp-eqcv {
 /* ===== Логотип ROSE × ORDAX ===== */
 .vxp-rolo{display:block;height:auto;max-width:100%;user-select:none;pointer-events:none;filter:drop-shadow(0 0 10px rgba(var(--va3),.35))}
 .vxp-rolo.wide{width:150px;margin:-2px auto 0}
-.vxp-headl{display:flex;align-items:center;gap:16px;min-width:0}
-.vxp-rolo.head{flex:none;height:62px;width:auto}
-@media (max-width:860px){.vxp-rolo.head{height:40px}}
+.vxp-headl{width:270px;max-width:100%;min-width:0}
+.vxp-rolo.head{width:100%;height:auto}
+@media (max-width:1260px){.vxp-headl{width:200px}}
+@media (max-width:860px){.vxp-headl{width:150px}}
