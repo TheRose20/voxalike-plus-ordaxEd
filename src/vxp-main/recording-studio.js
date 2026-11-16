@@ -119,7 +119,7 @@
             h('div', { class: 'vxp-headl' }, brandLogo('head')),
             h('div', { class: 'vxp-row' },
               h('button', { class: 'vxp-btn icon', type: 'button', title: tr('Закрыть (Esc)', 'Close (Esc)'), onclick: () => this.close() }, '✕'))),
-          h('div', { class: 'vxp-left' },
+          h('div', { class: 'vxp-left' }, brandLogo('side'),
             h('div', { class: 'vxp-sec' }, h('div', { class: 'vxp-title' }, h('span', null, tr('Мои реплики', 'My lines')), this.kicker), this.list)),
           h('div', { class: 'vxp-stagebox' },
             this.navRow,

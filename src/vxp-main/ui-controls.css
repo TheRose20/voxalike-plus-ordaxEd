@@ -882,6 +882,7 @@ canvas.vxp-eqcv {
     width: min(1500px, 100%);
     max-height: calc(100vh - 32px);
     overflow: auto;
+    position: relative;
     background:
         radial-gradient(
             90% 40% at 0 0,
@@ -1145,13 +1146,13 @@ canvas.vxp-eqcv {
 }
 .vxp-left {
     display: grid;
-    grid-template-rows: minmax(0, 1fr) auto;
-    gap: 10px;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 12px;
     align-content: start;
     min-width: 0;
     position: sticky;
     top: 0;
-    height: calc(100vh - 190px);
+    height: calc(100vh - 64px);
 }
 .vxp-left > .vxp-sec {
     display: flex;
@@ -1248,9 +1249,12 @@ canvas.vxp-eqcv {
 /* ===== Логотип ROSE × ORDAX ===== */
 .vxp-rolo{display:block;height:auto;max-width:100%;user-select:none;pointer-events:none;filter:drop-shadow(0 0 10px rgba(var(--va3),.35))}
 .vxp-rolo.wide{width:150px;margin:-2px auto 0}
-.vxp-headl{width:270px;max-width:100%;min-width:0}
+.vxp-headl{display:none;width:200px;max-width:100%;min-width:0}
+.vxp-rolo.side{width:100%;height:auto;margin:0 0 2px}
+/* широкая раскладка: шапки нет, крестик в углу, колонки начинаются с самого верха */
+@media (min-width:1261px){.vxp-card-head{position:absolute;top:10px;right:12px;z-index:6;width:auto}.vxp-side{padding-top:34px}.vxp-stagebox{margin-top:0}}
+@media (max-width:1260px){.vxp-headl{display:block}.vxp-rolo.side{display:none}}
 .vxp-rolo.head{width:100%;height:auto}
-@media (max-width:1260px){.vxp-headl{width:200px}}
 @media (max-width:860px){.vxp-headl{width:150px}}
 .vxp-title .vxp-cnt{margin-left:auto;font-size:10px;font-weight:900;letter-spacing:.04em;color:var(--va2);border:1px solid rgba(var(--va3),.45);background:rgba(var(--va3),.1);border-radius:999px;padding:1px 9px;text-transform:none;cursor:default}
 
