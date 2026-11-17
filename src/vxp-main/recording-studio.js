@@ -89,7 +89,7 @@
       this.btnMine = h('button', { class: 'vxp-btn', type: 'button', onclick: () => this.playMine(false) }, tr('▶ Моя запись', '▶ My take'));
       
       this.punchInfo = h('span', { class: 'vxp-hint', style: 'align-self:center' });
-      this.punchRow = h('div', { class: 'vxp-punch' }, h('div', { class: 'vxp-recrow' }, this.btnRecord, h('div', { class: 'vxp-reclbl' }, this.recLbl, this.punchInfo), this.btnRerecord,
+      this.punchRow = h('div', { class: 'vxp-punch' }, h('div', { class: 'vxp-recrow' }, h('div', { class: 'vxp-reclbl' }, this.recLbl, this.punchInfo), this.btnRerecord,
           checkbox({ label: tr('Заменять то, что под записью', 'Replace what is under the recording'), get: () => settings.punchReplace, set: (v) => { settings.punchReplace = v; saveSettings(); }, title: tr('Вкл — старый звук под новым куском вырезается; выкл — новый кусок накладывается сверху', 'On — the old sound under the new piece is cut out; off — the new piece is layered on top') })));
       
       this.editor.onMarker = () => this.updateButtons();
@@ -134,7 +134,7 @@
           h('div', { class: 'vxp-transport' },
             h('div', { class: 'vxp-tgrp' }, ed.btnCut, ed.btnDel, ed.btnUndo, ed.btnReset),
             h('i', { class: 'vxp-sep' }),
-            h('div', { class: 'vxp-tgrp' }, toStart, this.tPlay, toEnd),
+            h('div', { class: 'vxp-tgrp' }, this.btnRecord, toStart, this.tPlay, toEnd),
             h('i', { class: 'vxp-sep' }),
             h('div', { class: 'vxp-tgrp' }, ed.btnAuto, bp, h('div', { class: 'vxp-nudgewrap' }, gear, this.nudgePop)))); }
       this.title = h('h3'); this.kicker = h('small', { class: 'vxp-cnt', title: tr('Записано реплик из всех ваших', 'Lines recorded out of all yours') });

@@ -1363,3 +1363,7 @@ canvas.vxp-eqcv {
 .vxp-reclbl-t{font-size:14px;font-weight:900;color:var(--vt)}
 .vxp-reclbl .vxp-hint{font-size:11px;margin:0}
 .vxp-recrow .vxp-btn.ask{background:rgba(255,176,32,.16);border-color:var(--vw);color:var(--vw)}
+
+.vxp-transport .vxp-recbtn{width:46px;height:46px;border-width:2.5px;margin-right:6px}
+.vxp-transport .vxp-recbtn i{width:26px;height:26px}
+.vxp-transport .vxp-recbtn.stop i{width:18px;height:18px;border-radius:5px}
