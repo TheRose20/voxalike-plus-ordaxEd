@@ -125,14 +125,17 @@
         ed.setPlaying(false);
         const toStart = btn('vxp-tb ico', 'skipb', '', tr('Метку в начало', 'Marker to start'), () => { ed.marker = 0; ed.draw(); ed.onMarker && ed.onMarker(); });
         const toEnd = btn('vxp-tb ico', 'skipf', '', tr('Метку в конец', 'Marker to end'), () => { ed.marker = this.clip ? this.clipDur() : 0; ed.draw(); ed.onMarker && ed.onMarker(); });
-        this.nudgePop = h('div', { class: 'vxp-nudgepop' }, h('div', { class: 'vxp-tgrp' }, ed.btnNudgeL, ed.label, ed.btnNudgeR), ed.playOpts, checkbox({ label: tr('Выравнивать громкость', 'Auto-level volume'), get: () => settings.autoLevel, set: (v) => { settings.autoLevel = v; saveSettings(); this.applyLevel(); this.updateLoud(); }, title: tr('Подгоняет среднюю громкость моей записи под среднюю громкость оригинала (при записи и сохранении)', 'Matches the average loudness of my take to the original') }));
+        this.nudgePop = h('div', { class: 'vxp-nudgepop' }, h('div', { class: 'vxp-tgrp' }, ed.btnNudgeL, ed.label, ed.btnNudgeR), ed.playOpts, this.btnCueClr, checkbox({ label: tr('Выравнивать громкость', 'Auto-level volume'), get: () => settings.autoLevel, set: (v) => { settings.autoLevel = v; saveSettings(); this.applyLevel(); this.updateLoud(); }, title: tr('Подгоняет среднюю громкость моей записи под среднюю громкость оригинала (при записи и сохранении)', 'Matches the average loudness of my take to the original') }));
+        ed.onCues = (arr) => { try { const s = settings.cues = settings.cues || {}; if (this.clip) { if (arr.length) s[this.clip.id] = arr; else delete s[this.clip.id]; const ks = Object.keys(s); if (ks.length > 80) delete s[ks[0]]; saveSettings(); } } catch {} };
+        this.btnCue = btn('vxp-tb', 'flag', '', tr('Метка в текущей точке (M). Двойной клик по линейке — тоже. Рядом с меткой — убирает', 'Marker at the current point (M). Double-click the ruler too. Near a marker — removes it'), () => this.addCue());
+        this.btnCueClr = h('button', { class: 'vxp-btn small', type: 'button', onclick: () => ed.clearCues() }, tr('Убрать все метки', 'Clear all markers'));
         const gear = btn('vxp-tb ico', 'cog', '', tr('Сдвиг, зацикливание, воспроизведение с метки', 'Shift, loop, play from marker'), () => this.nudgePop.classList.toggle('open'));
         this.doc.addEventListener('mousedown', (e) => { if (this.nudgePop.classList.contains('open') && !e.target.closest('.vxp-nudgewrap')) this.nudgePop.classList.remove('open'); }, true);
         const draw0 = ed.draw.bind(ed); ed.draw = () => { draw0(); this.updateTime(); };
         ed.root.replaceChildren(
           h('div', { class: 'vxp-wavebox' }, ed.canvas, this.laneO, this.loudO, this.laneM, this.loudM, this.timeEl),
           h('div', { class: 'vxp-transport' },
-            h('div', { class: 'vxp-tgrp' }, ed.btnCut, ed.btnDel, ed.btnUndo, ed.btnReset),
+            h('div', { class: 'vxp-tgrp' }, ed.btnCut, this.btnCue, ed.btnDel, ed.btnUndo, ed.btnReset),
             h('i', { class: 'vxp-sep' }),
             h('div', { class: 'vxp-tgrp' }, this.btnRecord, toStart, this.tPlay, toEnd),
             h('i', { class: 'vxp-sep' }),
@@ -171,7 +174,7 @@
             this.editor.root,
             this.punchRow,
             h('div', { class: 'vxp-saverow' }, this.btnSave, this.btnDel),
-            h('details', { class: 'vxp-keys' }, h('summary', null, svgIcon('keys'), tr('Горячие клавиши', 'Hotkeys')), h('p', null, tr('Клавиши: R — запись/стоп · Shift+R — перезапись · Пробел — моя запись · Enter — сохранить и далее · [ ] — сдвиг · A — авто · Esc — закрыть', 'Keys: R — record/stop · Shift+R — re-record · Space — my take · Enter — save and next · [ ] — shift · A — auto · Esc — close')))),
+            h('details', { class: 'vxp-keys' }, h('summary', null, svgIcon('keys'), tr('Горячие клавиши', 'Hotkeys')), h('p', null, tr('Клавиши: R — запись/стоп · Shift+R — перезапись · M — метка-ориентир · Пробел — моя запись · Enter — сохранить и далее · [ ] — сдвиг · A — авто · Esc — закрыть', 'Keys: R — record/stop · Shift+R — re-record · Space — my take · Enter — save and next · [ ] — shift · A — auto · Esc — close')))),
           h('div', { class: 'vxp-side' },
             h('div', { class: 'vxp-sec' }, h('div', { class: 'vxp-title' }, h('span', null, tr('Обработка звука', 'Sound processing'))), fx.main),
             studioSec('space', tr('Пространство', 'Space'), fx.space),
@@ -261,6 +264,10 @@
       if (pw) { try { pw.close(); } catch {} }
       emit('queue');
     }
+    addCue() {
+      const ed = this.editor, t = ed.playhead != null ? ed.playhead : ed.marker != null ? ed.marker : 0;
+      ed.toggleCue(t);
+    }
     onKey(e) {
       if (isTyping(e.target) || this.counting) return;
       const k = e.key, ctrl = e.ctrlKey || e.metaKey, ed = this.editor;
@@ -268,6 +275,7 @@
       else if (k === 'Escape') { e.preventDefault(); this.close(); }
       else if (ctrl) { if (ed.handleKey(e)) e.preventDefault(); else return; }
       else if ('rRкК'.includes(k)) { e.preventDefault(); e.shiftKey ? this.askRerecord() : this.doRecord(false); }
+      else if ('mMьЬ'.includes(k)) { e.preventDefault(); this.addCue(); }
       else if (k === ' ') { e.preventDefault(); this.playMine(false); }
       else if (k === 'Enter') { e.preventDefault(); this.save(true); }
       else if (k === '[' || k === 'х') { e.preventDefault(); this.editor.nudge(e.shiftKey ? -50 : -10); }
@@ -296,6 +304,7 @@
       const a = g.assignments[index]; if (!a) return;
       this.index = index; this.assignment = a;
       this.clip = this.pack.clips.find((c) => c.id === a.clipId);
+      this.editor.cues = ((settings.cues || {})[a.clipId] || []).slice();
       if (!this.clip) { toast(tr('Клип ' + a.clipId + ' не найден в моде', 'Clip ' + a.clipId + ' not found in the mod'), 'err'); return; }
       this.title.textContent = '#' + (index + 1) + ' · ' + (a.title || this.clip.title || '');
       this.subSpeaker.textContent = this.speakerName();

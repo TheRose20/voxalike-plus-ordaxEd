@@ -4,7 +4,7 @@
   class TrackEditor {
     /** onChange(kind) — модель изменена (kind: move | offset | cut | delete | undo | reset | auto) */
     constructor({ onChange, onPlay }) {
-      this.ref = null; this.model = null; this.live = null; this.playhead = null; this.marker = null; this.onMarker = null;
+      this.ref = null; this.model = null; this.live = null; this.playhead = null; this.marker = null; this.onMarker = null; this.cues = []; this.onCues = null;
       this.sel = new Set(); this.tool = 'move'; this.hist = []; this.hoverT = null;
       this.onChange = onChange; this.onPlay = onPlay;
       this.canvas = h('canvas', { class: 'vxp-tracks', tabindex: '0', title: tr('Клик — выбрать кусок, тянуть — двигать. Ножницы — разрезать. Delete — удалить, Ctrl+Z — отменить', 'Click — select a piece, drag — move. Scissors — cut. Delete — remove, Ctrl+Z — undo') });
@@ -205,13 +205,26 @@
       }
       return { start, end };
     }
+    /** Метки-ориентиры (как маркеры в DAW): ставит/убирает метку в точке t (сек); рядом (≤0.1 c) — убирает. */
+    toggleCue(t) {
+      if (t == null || !isFinite(t)) return;
+      t = Math.round(Math.max(0, t) * 100) / 100;
+      const i = this.cues.findIndex((q) => Math.abs(q - t) <= 0.1);
+      if (i >= 0) this.cues.splice(i, 1); else { this.cues.push(t); this.cues.sort((a, b) => a - b); }
+      this.draw(); this.onCues && this.onCues(this.cues.slice());
+    }
+    clearCues() { if (!this.cues.length) return; this.cues = []; this.draw(); this.onCues && this.onCues([]); }
     tAt(e, v) { const r = this.canvas.getBoundingClientRect(); return v.start + ((e.clientX - r.left) / r.width) * (v.end - v.start); }
     bindPointer() {
       let drag = null;
       const c = this.canvas;
+      c.addEventListener('dblclick', (e) => {
+        if (this.live || e.clientY - c.getBoundingClientRect().top > 18) return;
+        this.toggleCue(this.tAt(e, this.view()));
+      });
       c.addEventListener('pointerdown', (e) => {
         try { c.focus({ preventScroll: true }); } catch {}
-        if (this.live || !this.model) return;
+        if (this.live || (!this.model && !this.ref)) return;
         const v = this.view(), t = this.tAt(e, v);
         
         // Если клик по верхней панели (линейке) — двигаем метку
@@ -222,6 +235,7 @@
           this.draw(); this.onMarker && this.onMarker();
           return;
         }
+        if (!this.model) return;
 
         if (this.tool === 'cut') { if (!this.split(t)) toast(tr('Режьте внутри своей дорожки', 'Cut inside your own track')); return; }
         const seg = this.segAt(t);
@@ -367,7 +381,17 @@
         g.fillStyle = THEME.acc; g.fillRect(px, 6, 2, H - 6);
         g.beginPath(); g.arc(px + 1, 6, 4.5, 0, Math.PI * 2); g.fill();
       }
-      if (this.marker != null && m) {
+      if (this.cues.length) {
+        g.save(); g.font = '700 10px system-ui,sans-serif'; g.textBaseline = 'middle';
+        this.cues.forEach((q, i) => {
+          const cx = Math.round(x(q)); if (cx < -20 || cx > W + 20) return;
+          g.strokeStyle = 'rgba(82,199,255,.8)'; g.lineWidth = 1; g.beginPath(); g.moveTo(cx + 0.5, 12); g.lineTo(cx + 0.5, H); g.stroke();
+          g.fillStyle = '#52c7ff'; g.fillRect(cx, 2, 15, 12); g.beginPath(); g.moveTo(cx, 14); g.lineTo(cx + 5, 14); g.lineTo(cx, 19); g.closePath(); g.fill();
+          g.fillStyle = '#06222e'; g.fillText(String(i + 1), cx + 3, 8.5);
+        });
+        g.restore();
+      }
+      if (this.marker != null && (m || this.ref)) {
         const mx = Math.round(x(this.marker));
         g.save(); g.strokeStyle = THEME.acc; g.fillStyle = THEME.acc; g.lineWidth = 1.5; g.setLineDash([4, 3]);
         g.beginPath(); g.moveTo(mx + 0.5, 0); g.lineTo(mx + 0.5, H); g.stroke(); g.setLineDash([]);
