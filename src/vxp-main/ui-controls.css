@@ -10,7 +10,7 @@
     --vcard: #0c0c10;
     --vp0: #131318;
     --vp1: #0b0b0e;
-    --vov: rgba(3, 3, 5, 0.82);
+    --vov: rgba(3, 3, 5, 0.92);
     --va3: 255, 90, 0;
     --vb: #0b0b0e;
     --v1: #121216;
@@ -471,7 +471,7 @@ canvas.vxp-tracks:focus {
     inset: 0;
     z-index: 2147483640;
     background: rgba(3, 3, 5, 0.84);
-    backdrop-filter: blur(4px);
+    /* backdrop-filter убран: тяжёлый при скролле */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -868,7 +868,7 @@ canvas.vxp-eqcv {
     inset: 0;
     z-index: 2147483600;
     background: var(--vov);
-    backdrop-filter: blur(4px);
+    /* backdrop-filter убран: тяжёлый при скролле */
     display: flex;
     align-items: center;
     justify-content: center;
