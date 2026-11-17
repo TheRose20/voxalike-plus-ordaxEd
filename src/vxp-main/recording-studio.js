@@ -81,15 +81,16 @@
       });
       this.editor.canvas.classList.add('big');
       
-      this.btnRecord = h('button', { class: 'vxp-btn rec wide big', title: tr('Запись / стоп (клавиша R)', 'Record / stop (R key)'), type: 'button', onclick: () => this.doRecord(false) }, tr('● Записать', '● Record'));
-      this.btnRerecord = h('button', { class: 'vxp-btn wide big', title: tr('Перезаписать реплику с начала (Shift+R)', 'Re-record the line from the start (Shift+R)'), type: 'button', onclick: () => this.askRerecord() }, tr('⟲ Перезаписать', '⟲ Re-record'));
+      this.btnRecord = h('button', { class: 'vxp-recbtn', title: tr('Запись / стоп (клавиша R)', 'Record / stop (R key)'), type: 'button', 'aria-label': tr('Записать', 'Record'), onclick: () => this.doRecord(false) }, h('i'));
+      this.recLbl = h('b', { class: 'vxp-reclbl-t' }, tr('Записать', 'Record'));
+      this.btnRerecord = h('button', { class: 'vxp-btn vxp-tb', title: tr('Перезаписать реплику с начала (Shift+R)', 'Re-record the line from the start (Shift+R)'), type: 'button', onclick: () => this.askRerecord() }, tr('⟲ Перезаписать', '⟲ Re-record'));
       
       this.btnOrig = h('button', { class: 'vxp-btn', type: 'button', onclick: () => this.playOriginal() }, tr('▶ Оригинал', '▶ Original'));
       this.btnMine = h('button', { class: 'vxp-btn', type: 'button', onclick: () => this.playMine(false) }, tr('▶ Моя запись', '▶ My take'));
       
       this.punchInfo = h('span', { class: 'vxp-hint', style: 'align-self:center' });
-      this.punchRow = h('div', { class: 'vxp-punch' }, h('div', { class: 'vxp-recpair' }, this.btnRecord, this.btnRerecord),
-        h('div', { class: 'vxp-punchopt' }, this.punchInfo, checkbox({ label: tr('Заменять то, что под записью', 'Replace what is under the recording'), get: () => settings.punchReplace, set: (v) => { settings.punchReplace = v; saveSettings(); }, title: tr('Вкл — старый звук под новым куском вырезается; выкл — новый кусок накладывается сверху', 'On — the old sound under the new piece is cut out; off — the new piece is layered on top') })));
+      this.punchRow = h('div', { class: 'vxp-punch' }, h('div', { class: 'vxp-recrow' }, this.btnRecord, h('div', { class: 'vxp-reclbl' }, this.recLbl, this.punchInfo), this.btnRerecord,
+          checkbox({ label: tr('Заменять то, что под записью', 'Replace what is under the recording'), get: () => settings.punchReplace, set: (v) => { settings.punchReplace = v; saveSettings(); }, title: tr('Вкл — старый звук под новым куском вырезается; выкл — новый кусок накладывается сверху', 'On — the old sound under the new piece is cut out; off — the new piece is layered on top') })));
       
       this.editor.onMarker = () => this.updateButtons();
       this.btnSave = h('button', { class: 'vxp-btn primary wide big', title: tr('Отправить в очередь и перейти к следующей реплике (Enter)', 'Queue it and go to the next line (Enter)'), type: 'button', onclick: () => this.save(true) }, tr('✓ Сохранить → далее', '✓ Save → next'));
@@ -363,12 +364,12 @@
         this.btnPrev.disabled = recOn || busy || mine.length < 2; this.btnNext.disabled = recOn || busy || mine.length < 2; }
       
       if (recOn) {
-        this.btnRecord.textContent = tr('■ Стоп', '■ Stop');
+        this.recLbl.textContent = tr('Стоп', 'Stop'); this.btnRecord.classList.add('stop');
         this.btnRecord.disabled = false;
         this.btnRerecord.textContent = tr('■ Стоп', '■ Stop');
         this.btnRerecord.disabled = true;
       } else {
-        this.btnRecord.textContent = this.model ? tr('● Запись с метки', '● Record at marker') : tr('● Записать', '● Record');
+        this.recLbl.textContent = this.model ? tr('Запись с метки', 'Record at marker') : tr('Записать', 'Record'); this.btnRecord.classList.remove('stop');
         this.btnRecord.disabled = busy || this.counting;
         this.btnRerecord.textContent = this.rerecPending ? tr('⚠ Точно перезаписать?', '⚠ Really re-record?') : tr('⟲ Перезаписать', '⟲ Re-record');
         this.btnRerecord.classList.toggle('ask', !!this.rerecPending);
