@@ -24,7 +24,7 @@
 (() => {
   'use strict';
   if (window.__VXP__) return;
-  const VERSION = '1.38.2';
+  const VERSION = '1.39.0';
   const VXP = (window.__VXP__ = { version: VERSION });
   const IS_FF = /firefox/i.test(navigator.userAgent);
 
@@ -86,7 +86,7 @@
       nr: false, nrStrength: 55, theme: 'ordax',
       studioGuide: true, guideVol: 0.55, studioPopout: false, quietSite: true,
       countdown: 3, countBeep: true, tailSec: 5,
-      autoSubmit: true, notifyTurn: true, hotkeys: true, lobbyStats: true, punchReplace: true, loopPlay: false, playFromMarker: false,
+      autoSubmit: true, notifyTurn: true, hotkeys: true, lobbyStats: true, punchReplace: true, loopPlay: false, autoLevel: false, playFromMarker: false,
       fx: defFx(),
       collapsed: {},
       lang: 'auto', // auto | ru | en

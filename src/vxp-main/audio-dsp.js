@@ -538,7 +538,7 @@ registerProcessor('vxp-nr',VxpNRProc);`;
   //           segs:[{id, a, b, pos}] — куски base[a..b), стоящие на таймлайне с позиции pos (сек) }
   const FX_KEYS = ['pitch', 'gain', 'lowcut', 'speed', 'underwater', 'echo', 'space', 'denoise', 'eq', 'comp', 'deess', 'lim', 'vox', 'nn', 'room'];
   const defaultParams = () => ({ offset: 0, ...cloneJ(settings.fx) });
-  const isDefaultParams = (p) => !p.offset && !p.pitch && !p.gain && !p.lowcut && (p.speed || 1) === 1 && !p.underwater && !p.echo && !(p.space && p.space.mix) && !p.denoise && !(p.vox && p.vox.on) && !(p.room && p.room.on) && !chainOn(p);
+  const isDefaultParams = (p) => !p.offset && !p.pitch && !p.gain && !p.level && !p.lowcut && (p.speed || 1) === 1 && !p.underwater && !p.echo && !(p.space && p.space.mix) && !p.denoise && !(p.vox && p.vox.on) && !(p.room && p.room.on) && !chainOn(p);
   let segSeq = 1;
   const segSig = (m) => JSON.stringify(m.segs.map((s) => [s.a, s.b, +s.pos.toFixed(5), s.fx || 0]));
   function initSegs(m) {
@@ -632,7 +632,7 @@ registerProcessor('vxp-nr',VxpNRProc);`;
     if (p.underwater) x = underwater(x, m.sr);
     if (p.echo) x = echo(x, m.sr);
     if (p.space && p.space.mix) x = space(x, m.sr, p.space);
-    if (p.gain) { const g = dbToLin(p.gain); for (let i = 0; i < x.length; i++) x[i] *= g; }
+    if (p.gain || p.level) { const g = dbToLin((p.gain || 0) + (p.level || 0)); for (let i = 0; i < x.length; i++) x[i] *= g; }
     if (p.lim && p.lim.on) { const r = limiter(x, m.sr, p.lim); x = r.y; trc.lim = r.gr; }
     const pk = peakOf(x);
     if (pk > 0.98) { const k = 0.98 / pk; for (let i = 0; i < x.length; i++) x[i] *= k; }

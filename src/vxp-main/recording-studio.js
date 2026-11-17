@@ -76,7 +76,7 @@
       this.videoBox = h('div', { class: 'vxp-video' }, this.video, this.cue);
       this.subSpeaker = h('span'); this.subText = h('p');
       this.editor = new TrackEditor({
-        onChange: () => { if (this.model) this.dirty = true; this.updateLoud && this.updateLoud(); },
+        onChange: () => { if (this.model) this.dirty = true; this.applyLevel && this.applyLevel(); this.updateLoud && this.updateLoud(); },
         onPlay: () => this.playMine(true),
       });
       this.editor.canvas.classList.add('big');
@@ -125,7 +125,7 @@
         ed.setPlaying(false);
         const toStart = btn('vxp-tb ico', 'skipb', '', tr('Метку в начало', 'Marker to start'), () => { ed.marker = 0; ed.draw(); ed.onMarker && ed.onMarker(); });
         const toEnd = btn('vxp-tb ico', 'skipf', '', tr('Метку в конец', 'Marker to end'), () => { ed.marker = this.clip ? this.clipDur() : 0; ed.draw(); ed.onMarker && ed.onMarker(); });
-        this.nudgePop = h('div', { class: 'vxp-nudgepop' }, h('div', { class: 'vxp-tgrp' }, ed.btnNudgeL, ed.label, ed.btnNudgeR), ed.playOpts);
+        this.nudgePop = h('div', { class: 'vxp-nudgepop' }, h('div', { class: 'vxp-tgrp' }, ed.btnNudgeL, ed.label, ed.btnNudgeR), ed.playOpts, checkbox({ label: tr('Выравнивать громкость', 'Auto-level volume'), get: () => settings.autoLevel, set: (v) => { settings.autoLevel = v; saveSettings(); this.applyLevel(); this.updateLoud(); }, title: tr('Подгоняет среднюю громкость моей записи под среднюю громкость оригинала (при записи и сохранении)', 'Matches the average loudness of my take to the original') }));
         const gear = btn('vxp-tb ico', 'cog', '', tr('Сдвиг, зацикливание, воспроизведение с метки', 'Shift, loop, play from marker'), () => this.nudgePop.classList.toggle('open'));
         this.doc.addEventListener('mousedown', (e) => { if (this.nudgePop.classList.contains('open') && !e.target.closest('.vxp-nudgewrap')) this.nudgePop.classList.remove('open'); }, true);
         const draw0 = ed.draw.bind(ed); ed.draw = () => { draw0(); this.updateTime(); };
@@ -325,19 +325,46 @@
       }).filter(Boolean).join(' · ');
     }
     /** Средняя громкость (RMS, дБ отн. полной шкалы) по звучащим окнам 50 мс; для моей записи — по всем кускам вместе с усилением. */
+    /** Средняя громкость (RMS по звучащим окнам 50 мс, дБ): оригинал и моя запись (без авто-подгонки). */
+    measureLoud() {
+      const m = this.model, ref = this.ref;
+      const meas = (parts, sr, gainDb) => {
+        const W = Math.max(64, Math.round(sr * 0.05)); let sum = 0, n = 0;
+        for (const [x, a, b] of parts) for (let i = a; i + W <= b; i += W) { let e = 0; for (let k = i; k < i + W; k++) e += x[k] * x[k]; e /= W; if (e > 1e-5) { sum += e; n++; } }
+        return n ? 10 * Math.log10(sum / n) + gainDb : null;
+      };
+      const parts = m ? (m.segs || [{ a: 0, b: m.base.length }]).map((q) => [m.base, q.a, Math.min(q.b, m.base.length)]) : [];
+      return {
+        o: ref ? meas([[ref.samples, 0, ref.samples.length]], ref.sr, 0) : null,
+        m: m ? meas(parts, m.sr, (m.params.gain || 0)) : null,
+        peak: () => { let pk = 0; for (const [x, a, b] of parts) for (let i = a; i < b; i++) { const v = Math.abs(x[i]); if (v > pk) pk = v; } return pk; },
+      };
+    }
+    /** Выравнивание: m.params.level (дБ) подгоняет мою запись под среднюю громкость оригинала; без пережима (пик ≤ −0.5 дБ). */
+    applyLevel() {
+      try {
+        const m = this.model; if (!m) return;
+        let lv = 0;
+        if (settings.autoLevel && this.ref) {
+          const r = this.measureLoud();
+          if (r.o != null && r.m != null) {
+            lv = Math.max(-18, Math.min(12, r.o - r.m));
+            const pk = r.peak(); if (pk > 0 && lv > 0) lv = Math.min(lv, -0.5 - 20 * Math.log10(pk * Math.pow(10, (m.params.gain || 0) / 20)));
+            lv = Math.round(lv * 10) / 10;
+          }
+        }
+        if ((m.params.level || 0) !== lv) { m.params.level = lv; this._loudKey = null; }
+      } catch {}
+    }
     updateLoud() {
       try {
         const m = this.model, ref = this.ref;
-        const key = this.index + '|' + (ref ? ref.samples.length : 0) + '|' + (m ? m.segs && JSON.stringify(m.segs.map((q) => [q.a, q.b])) + '|' + (m.params.gain || 0) : '');
+        const key = this.index + '|' + (ref ? ref.samples.length : 0) + '|' + (m ? m.segs && JSON.stringify(m.segs.map((q) => [q.a, q.b])) + '|' + (m.params.gain || 0) + '|' + (m.params.level || 0) : '');
         if (key === this._loudKey) return; this._loudKey = key;
-        const meas = (parts, sr, gainDb) => {
-          const W = Math.max(64, Math.round(sr * 0.05)); let sum = 0, n = 0;
-          for (const [x, a, b] of parts) for (let i = a; i + W <= b; i += W) { let e = 0; for (let k = i; k < i + W; k++) e += x[k] * x[k]; e /= W; if (e > 1e-5) { sum += e; n++; } }
-          return n ? 10 * Math.log10(sum / n) + gainDb : null;
-        };
+        const r = this.measureLoud();
         const fmt = (v) => v == null ? '' : tr('средняя ', 'avg ') + v.toFixed(1).replace('-', '−') + ' ' + tr('дБ', 'dB');
-        this.loudO.textContent = ref ? fmt(meas([[ref.samples, 0, ref.samples.length]], ref.sr, 0)) : '';
-        this.loudM.textContent = m ? fmt(meas((m.segs || [{ a: 0, b: m.base.length }]).map((q) => [m.base, q.a, Math.min(q.b, m.base.length)]), m.sr, (m.params.gain || 0))) : '';
+        this.loudO.textContent = fmt(r.o);
+        this.loudM.textContent = r.m == null ? '' : fmt(r.m + (m.params.level || 0)) + (m.params.level ? ' (' + (m.params.level > 0 ? '+' : '−') + Math.abs(m.params.level).toFixed(1) + ')' : '');
       } catch {}
     }
     setSrc(k) {
@@ -543,7 +570,9 @@
         };
         initSegs(this.model);
         this.dirty = true;
+        this.applyLevel();
         this.refreshEditor();
+        this.setSrc('mine');
         this.markEnd(this.model.t0 + res.samples.length / res.sr);
         try { this.video.currentTime = this.clip.videoStartSeconds; } catch {}
       });
@@ -582,12 +611,14 @@
       const g = room.state && room.state.game;
       if (!g || !this.model || this.index == null) return;
       if (g.takes.some((t) => t.assignmentIndex === this.index)) { toast(tr('Эта реплика уже отправлена', 'This line has already been sent'), 'err'); return; }
+      this.applyLevel();
       { const key = qKey(g, this.index), q = { index: this.index, clipId: this.assignment.clipId, model: this.model, status: 'ready', savedAt: Date.now() };
         queue.set(key, q); qdb.put(key, q, g).then((ok) => { if (ok === null && !qdb.warned) { qdb.warned = true; toast(tr('Браузер не даёт сохранить очередь на диск — после F5 она пропадёт', 'The browser won\'t store the queue on disk — it will be lost on F5'), 'err'); } }); }
       this.dirty = false;
       emit('queue');
       trySubmit();
       if (!next) return;
+      this.setSrc('orig');
       toast(tr('Реплика #' + (this.index + 1) + ' в очереди', 'Line #' + (this.index + 1) + ' queued'));
       const mine = myLines().filter((a) => ['todo', 'now'].includes(lineStatus(g, a)) && a.index !== this.index);
       const nxt = mine.find((a) => a.index > this.index) || mine[0];
