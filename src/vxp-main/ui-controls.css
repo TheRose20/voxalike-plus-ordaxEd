@@ -1214,12 +1214,12 @@ canvas.vxp-eqcv {
 .vxp-nrbody.off{opacity:.45}
 .vxp-nrprof{display:grid;gap:6px;padding:8px;border:1px solid var(--vl);border-radius:8px;background:rgba(0,0,0,.18)}
 .vxp-nrh{font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--vd)}
-.vxp-card,.vxp-card *,.vxp-fxcard,.vxp-fxcard *,.vxp-panel,.vxp-panel *,.vxp-lines,.vxp-lines *{scrollbar-width:thin;scrollbar-color:rgba(var(--va3,255,90,0),.55) transparent}
-.vxp-card::-webkit-scrollbar,.vxp-card *::-webkit-scrollbar,.vxp-fxcard::-webkit-scrollbar,.vxp-fxcard *::-webkit-scrollbar,.vxp-panel::-webkit-scrollbar,.vxp-panel *::-webkit-scrollbar,.vxp-lines::-webkit-scrollbar,.vxp-lines *::-webkit-scrollbar{width:8px;height:8px}
-.vxp-card::-webkit-scrollbar-track,.vxp-card *::-webkit-scrollbar-track,.vxp-fxcard::-webkit-scrollbar-track,.vxp-fxcard *::-webkit-scrollbar-track,.vxp-panel::-webkit-scrollbar-track,.vxp-panel *::-webkit-scrollbar-track,.vxp-lines::-webkit-scrollbar-track,.vxp-lines *::-webkit-scrollbar-track{background:transparent}
-.vxp-card::-webkit-scrollbar-thumb,.vxp-card *::-webkit-scrollbar-thumb,.vxp-fxcard::-webkit-scrollbar-thumb,.vxp-fxcard *::-webkit-scrollbar-thumb,.vxp-panel::-webkit-scrollbar-thumb,.vxp-panel *::-webkit-scrollbar-thumb,.vxp-lines::-webkit-scrollbar-thumb,.vxp-lines *::-webkit-scrollbar-thumb{background:rgba(var(--va3,255,90,0),.5);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
-.vxp-card::-webkit-scrollbar-thumb:hover,.vxp-card *::-webkit-scrollbar-thumb:hover,.vxp-fxcard::-webkit-scrollbar-thumb:hover,.vxp-fxcard *::-webkit-scrollbar-thumb:hover,.vxp-panel::-webkit-scrollbar-thumb:hover,.vxp-panel *::-webkit-scrollbar-thumb:hover,.vxp-lines::-webkit-scrollbar-thumb:hover,.vxp-lines *::-webkit-scrollbar-thumb:hover{background:rgba(var(--va3,255,90,0),.85);background-clip:padding-box}
-.vxp-card::-webkit-scrollbar-corner,.vxp-card *::-webkit-scrollbar-corner,.vxp-fxcard::-webkit-scrollbar-corner,.vxp-fxcard *::-webkit-scrollbar-corner,.vxp-panel::-webkit-scrollbar-corner,.vxp-panel *::-webkit-scrollbar-corner,.vxp-lines::-webkit-scrollbar-corner,.vxp-lines *::-webkit-scrollbar-corner{background:transparent}
+.vxp-card,.vxp-fxcard,.vxp-panel,.vxp-lines{scrollbar-width:thin;scrollbar-color:rgba(var(--va3,255,90,0),.55) transparent}
+.vxp-card::-webkit-scrollbar,.vxp-fxcard::-webkit-scrollbar,.vxp-panel::-webkit-scrollbar,.vxp-lines::-webkit-scrollbar{width:8px;height:8px}
+.vxp-card::-webkit-scrollbar-track,.vxp-fxcard::-webkit-scrollbar-track,.vxp-panel::-webkit-scrollbar-track,.vxp-lines::-webkit-scrollbar-track{background:transparent}
+.vxp-card::-webkit-scrollbar-thumb,.vxp-fxcard::-webkit-scrollbar-thumb,.vxp-panel::-webkit-scrollbar-thumb,.vxp-lines::-webkit-scrollbar-thumb{background:rgba(var(--va3,255,90,0),.5);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+.vxp-card::-webkit-scrollbar-thumb:hover,.vxp-fxcard::-webkit-scrollbar-thumb:hover,.vxp-panel::-webkit-scrollbar-thumb:hover,.vxp-lines::-webkit-scrollbar-thumb:hover{background:rgba(var(--va3,255,90,0),.85);background-clip:padding-box}
+.vxp-card::-webkit-scrollbar-corner,.vxp-fxcard::-webkit-scrollbar-corner,.vxp-panel::-webkit-scrollbar-corner,.vxp-lines::-webkit-scrollbar-corner{background:transparent}
 .vxp-ic{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;opacity:.8}
 .vxp-lb{display:inline-flex;align-items:center;gap:8px}
 .vxp-fxpair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:10px;align-items:start}
