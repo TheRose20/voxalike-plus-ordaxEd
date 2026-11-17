@@ -1352,13 +1352,8 @@ canvas.vxp-eqcv {
 .vxp-recrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .vxp-recbtn{position:relative;flex:none;width:62px;height:62px;border-radius:50%;padding:0!important;min-height:0!important;cursor:pointer;background:transparent;border:3px solid #ee4452;display:grid;place-items:center}
 .vxp-recbtn i{width:38px;height:38px;border-radius:50%;background:#ee4452}
-.vxp-recbtn:hover i{background:#ff5a66}
-.vxp-recbtn:active i{transform:scale(.92)}
 .vxp-recbtn:disabled{opacity:.4;cursor:default}
 .vxp-recbtn.stop i{width:26px;height:26px;border-radius:7px}
-.vxp-recbtn::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:3px solid #ee4452;opacity:0;pointer-events:none}
-.vxp-recbtn.live::after{animation:vxpRing 1.2s ease-out infinite;will-change:transform,opacity}
-@keyframes vxpRing{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.35);opacity:0}}
 .vxp-reclbl{display:grid;gap:2px;min-width:0;flex:1 1 140px}
 .vxp-reclbl-t{font-size:14px;font-weight:900;color:var(--vt)}
 .vxp-reclbl .vxp-hint{font-size:11px;margin:0}
@@ -1367,3 +1362,5 @@ canvas.vxp-eqcv {
 .vxp-transport .vxp-recbtn{width:46px;height:46px;border-width:2.5px;margin-right:6px}
 .vxp-transport .vxp-recbtn i{width:26px;height:26px}
 .vxp-transport .vxp-recbtn.stop i{width:18px;height:18px;border-radius:5px}
+
+.vxp-recbtn,.vxp-recbtn *{animation:none!important;transition:none!important}
