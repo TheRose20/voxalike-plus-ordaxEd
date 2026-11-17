@@ -1376,3 +1376,10 @@ canvas.vxp-eqcv {
 .vxp-transport .vxp-recbtn{width:40px;height:40px;margin-right:2px}
 .vxp-transport .vxp-recbtn i{width:22px;height:22px}
 .vxp-transport .vxp-recbtn.stop i{width:15px;height:15px;border-radius:4px}
+
+/* запись: статичная SVG-кнопка, без теней, анимаций и фильтров */
+.vxp-recbtn,.vxp-transport .vxp-recbtn{width:42px;height:42px;border:0!important;background:none!important;box-shadow:none!important;padding:0!important;margin-right:2px;display:block;cursor:pointer}
+.vxp-recbtn svg{display:block;pointer-events:none}
+.vxp-recbtn .q{display:none}
+.vxp-recbtn.stop .q{display:block}.vxp-recbtn.stop .d{display:none}
+.vxp-recbtn:disabled{opacity:.4}

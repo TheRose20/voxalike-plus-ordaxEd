@@ -81,7 +81,7 @@
       });
       this.editor.canvas.classList.add('big');
       
-      this.btnRecord = h('button', { class: 'vxp-recbtn', title: tr('Запись / стоп (клавиша R)', 'Record / stop (R key)'), type: 'button', 'aria-label': tr('Записать', 'Record'), onclick: () => this.doRecord(false) }, h('i'));
+      this.btnRecord = h('button', { class: 'vxp-recbtn', title: tr('Запись / стоп (клавиша R)', 'Record / stop (R key)'), type: 'button', 'aria-label': tr('Записать', 'Record'), onclick: () => this.doRecord(false) }, (() => { const NS = 'http://www.w3.org/2000/svg', s = this.doc.createElementNS(NS, 'svg'); s.setAttribute('viewBox', '0 0 48 48'); s.setAttribute('width', '100%'); s.setAttribute('height', '100%'); s.innerHTML = '<circle cx="24" cy="24" r="21" fill="none" stroke="#ee4452" stroke-width="3"/><circle class="d" cx="24" cy="24" r="14" fill="#ee4452"/><rect class="q" x="16" y="16" width="16" height="16" rx="4" fill="#ee4452"/>'; return s; })());
       this.recLbl = h('b', { class: 'vxp-reclbl-t' }, tr('Записать', 'Record'));
       this.btnRerecord = h('button', { class: 'vxp-btn vxp-tb', title: tr('Перезаписать реплику с начала (Shift+R)', 'Re-record the line from the start (Shift+R)'), type: 'button', onclick: () => this.askRerecord() }, tr('⟲ Перезаписать', '⟲ Re-record'));
       
