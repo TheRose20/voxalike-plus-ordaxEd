@@ -89,8 +89,8 @@
       this.btnMine = h('button', { class: 'vxp-btn', type: 'button', onclick: () => this.playMine(false) }, tr('▶ Моя запись', '▶ My take'));
       
       this.punchInfo = h('span', { class: 'vxp-hint', style: 'align-self:center' });
-      this.punchRow = h('div', { class: 'vxp-punch' }, h('div', { class: 'vxp-recrow' }, h('div', { class: 'vxp-reclbl' }, this.recLbl, this.punchInfo), this.btnRerecord,
-          checkbox({ label: tr('Заменять то, что под записью', 'Replace what is under the recording'), get: () => settings.punchReplace, set: (v) => { settings.punchReplace = v; saveSettings(); }, title: tr('Вкл — старый звук под новым куском вырезается; выкл — новый кусок накладывается сверху', 'On — the old sound under the new piece is cut out; off — the new piece is layered on top') })));
+      this.punchChk = checkbox({ label: tr('Заменять то, что под записью', 'Replace what is under the recording'), get: () => settings.punchReplace, set: (v) => { settings.punchReplace = v; saveSettings(); }, title: tr('Вкл — старый звук под новым куском вырезается; выкл — новый кусок накладывается сверху', 'On — the old sound under the new piece is cut out; off — the new piece is layered on top') });
+      this.punchRow = h('div', { class: 'vxp-punch' }, h('div', { class: 'vxp-recrow' }, h('div', { class: 'vxp-reclbl' }, this.recLbl, this.punchInfo), this.btnRerecord));
       
       this.editor.onMarker = () => this.updateButtons();
       this.btnSave = h('button', { class: 'vxp-btn primary wide big', title: tr('Отправить в очередь и перейти к следующей реплике (Enter)', 'Queue it and go to the next line (Enter)'), type: 'button', onclick: () => this.save(true) }, tr('✓ Сохранить → далее', '✓ Save → next'));
@@ -125,7 +125,7 @@
         ed.setPlaying(false);
         const toStart = btn('vxp-tb ico', 'skipb', '', tr('Метку в начало', 'Marker to start'), () => { ed.marker = 0; ed.draw(); ed.onMarker && ed.onMarker(); });
         const toEnd = btn('vxp-tb ico', 'skipf', '', tr('Метку в конец', 'Marker to end'), () => { ed.marker = this.clip ? this.clipDur() : 0; ed.draw(); ed.onMarker && ed.onMarker(); });
-        this.nudgePop = h('div', { class: 'vxp-nudgepop' }, h('div', { class: 'vxp-tgrp' }, ed.btnNudgeL, ed.label, ed.btnNudgeR), ed.playOpts, this.btnCueClr, checkbox({ label: tr('Выравнивать громкость', 'Auto-level volume'), get: () => settings.autoLevel, set: (v) => { settings.autoLevel = v; saveSettings(); this.applyLevel(); this.updateLoud(); }, title: tr('Подгоняет среднюю громкость моей записи под среднюю громкость оригинала (при записи и сохранении)', 'Matches the average loudness of my take to the original') }));
+        this.nudgePop = h('div', { class: 'vxp-nudgepop' }, h('div', { class: 'vxp-tgrp' }, ed.btnNudgeL, ed.label, ed.btnNudgeR), ed.playOpts, this.punchChk, this.btnCueClr, checkbox({ label: tr('Выравнивать громкость', 'Auto-level volume'), get: () => settings.autoLevel, set: (v) => { settings.autoLevel = v; saveSettings(); this.applyLevel(); this.updateLoud(); }, title: tr('Подгоняет среднюю громкость моей записи под среднюю громкость оригинала (при записи и сохранении)', 'Matches the average loudness of my take to the original') }));
         ed.onCues = (arr) => { try { const s = settings.cues = settings.cues || {}; if (this.clip) { if (arr.length) s[this.clip.id] = arr; else delete s[this.clip.id]; const ks = Object.keys(s); if (ks.length > 80) delete s[ks[0]]; saveSettings(); } } catch {} };
         this.btnCue = btn('vxp-tb', 'flag', '', tr('Метка в текущей точке (M). Двойной клик по линейке — тоже. Рядом с меткой — убирает', 'Marker at the current point (M). Double-click the ruler too. Near a marker — removes it'), () => this.addCue());
         this.btnCueClr = h('button', { class: 'vxp-btn small', type: 'button', onclick: () => ed.clearCues() }, tr('Убрать все метки', 'Clear all markers'));
