@@ -115,7 +115,7 @@
         new MutationObserver(syncPlay).observe(this.btnOrig, { childList: true, characterData: true, subtree: true, attributes: true });
         new MutationObserver(syncPlay).observe(this.btnMine, { childList: true, characterData: true, subtree: true, attributes: true });
         syncPlay();
-        ed.btnCut.className = 'vxp-btn vxp-tb'; ed.btnCut.replaceChildren(svgIcon('cut'), tr('Обрезать', 'Cut')); ed.btnCut.onclick = () => ed.setTool(ed.tool === 'cut' ? 'move' : 'cut');
+        ed.btnCut.className = 'vxp-btn vxp-tb'; ed.btnCut.replaceChildren(svgIcon('cut'), tr('Обрезать', 'Cut'));
         ed.btnDel.className = 'vxp-btn vxp-tb'; ed.btnDel.replaceChildren(svgIcon('trash'), tr('Удалить', 'Delete'));
         ed.btnUndo.className = 'vxp-btn vxp-tb ico'; ed.btnUndo.replaceChildren(svgIcon('undo'));
         ed.btnReset.className = 'vxp-btn vxp-tb ico'; ed.btnReset.replaceChildren(svgIcon('reset'));

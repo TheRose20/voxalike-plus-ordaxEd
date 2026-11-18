@@ -11,7 +11,7 @@
       this.label = h('span', { class: 'vxp-offset' }, fmtMs(0));
       const B = (txt, title, fn, cls = 'icon') => h('button', { class: 'vxp-btn ' + cls, type: 'button', title, onclick: fn }, txt);
       this.btnMove = B('↔', tr('Выбор и перемещение кусков (V). Shift+клик — выбрать несколько', 'Select and move pieces (V). Shift+click — select several'), () => this.setTool('move'));
-      this.btnCut = B('✂', tr('Ножницы: клик по своей дорожке — разрезать (S)', 'Scissors: click your track to cut (S)'), () => this.setTool('cut'));
+      this.btnCut = B('✂', tr('Ножницы: клик по своей дорожке — разрезать (S)', 'Scissors: click your track to cut (S)'), () => this.setTool(this.tool === 'cut' ? 'move' : 'cut'));
       this.btnDel = B('🗑', tr('Удалить выбранные куски (Delete)', 'Delete selected pieces (Delete)'), () => this.deleteSel());
       this.btnUndo = B('↶', tr('Отменить (Ctrl+Z)', 'Undo (Ctrl+Z)'), () => this.undo());
       this.btnReset = B('⟲', tr('Сбросить монтаж и сдвиг', 'Reset edits and shift'), () => this.resetEdit());
