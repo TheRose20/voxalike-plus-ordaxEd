@@ -1,5 +1,5 @@
 /*!
- * Voxalike+OrdaxEd — модуль «Эффектор» 1.1.0
+ * Voxalike+OrdaxEd — модуль «Эффектор» 1.1.1
  * Отдельный файл: подключается к основному моду (vxp-main.js) и работает только вместе с ним.
  * Голосовой эффектор для записанной дорожки: питч и формант по отдельности, слои (суб-октава, гармонайзер, хор),
  * шёпот, робот, кольцевая модуляция, рычание, дисторшн, цифровой хруст, тембр. Пресеты: демон, дракон, веном, робот и другие,
@@ -321,7 +321,7 @@
     const cur = () => settings.fx.vox || { on: false };
     const val = (k) => (cur()[k] == null ? DEF[k] : +cur()[k]);
     let ctxNow = null; const knobs = new Set(); const syncAll = () => { for (const k of knobs) k._sync(); };
-    const patch = (o, done) => { settings.fx.vox = Object.assign({}, cur(), o); if (done) { saveSettings(); ctxNow && ctxNow.commit(); } };
+    const patch = (o, done, c) => { settings.fx.vox = Object.assign({}, cur(), o); if (done) { saveSettings(); const t = ctxNow || c; t && t.commit(); } };
 
     const pt = (v) => (v ? (v > 0 ? '+' : '') + v : '0');
     const pc = (v) => (v ? v + '%' : tr('выкл', 'off'));
@@ -488,7 +488,7 @@
       id: 'vox',
       build(ctx) {
         const btn = h('button', { class: 'vxp-btn wide link', type: 'button', title: tr('Питч и формант, суб-октава, хор, рык, робот, дисторшн и пресеты: демон, дракон, веном', 'Pitch and formant, sub octave, chorus, growl, robot, drive and presets: demon, dragon, venom'), onclick: () => openStudio(ctx) }, h('span', { class: 'vxp-lb' }, api.icon ? api.icon('mic') : null, 'ORDAX FX · ' + tr('эффекты голоса', 'voice effects')));
-        const on = checkbox({ label: tr('Эффектор включён', 'Effector on'), get: () => cur().on, set: (v) => { patch({ on: v }, true); }, title: tr('Обработать мою дорожку эффектором. Работает по готовой записи', 'Process my take with the effector. Works on the recorded take') });
+        const on = checkbox({ label: tr('Эффектор включён', 'Effector on'), get: () => cur().on, set: (v) => { patch({ on: v }, true, ctx); }, title: tr('Обработать мою дорожку эффектором. Работает по готовой записи', 'Process my take with the effector. Works on the recorded take') });
         return h('div', { style: 'display:grid;gap:7px' }, btn, on);
       },
     });
