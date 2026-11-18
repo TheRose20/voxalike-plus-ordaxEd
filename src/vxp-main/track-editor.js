@@ -137,10 +137,10 @@
     auto() {
       if (!this.ref || !this.model) return toast(tr('Нет записи для подгонки', 'No recording to align'));
       this.pushHist();
-      const ms = Math.round(alignOffset(this.model, this.ref));
-      this.model.params.offset = clamp(ms, -9000, 9000);
+      const r = smartAlign(this.model, this.ref);
+      this.sel.clear();
       this.commit('auto');
-      toast(tr('Автоподгонка: ', 'Auto-align: ') + fmtMs(ms));
+      toast(tr('Автоподгонка: ', 'Auto-align: ') + fmtMs(r.offset) + (r.pieces > 1 ? tr(' · фраз: ', ' · phrases: ') + r.pieces + (r.moved ? tr(', сдвинуто ', ', moved ') + r.moved : '') : ''));
     }
     deleteSel() {
       const m = this.model;

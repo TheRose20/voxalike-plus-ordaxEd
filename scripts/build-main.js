@@ -17,6 +17,7 @@ const files = [
   'bootstrap.js',
   'brand-logo.js',
   'audio-dsp.js',
+  'smart-align.js',
   'game-audio.js',
   'track-editor.js',
   'ui-controls.js',
