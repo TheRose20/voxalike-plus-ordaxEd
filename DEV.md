@@ -1,9 +1,11 @@
 # Разработка (форк Voxalike+OrdaxEd)
 
 Структура:
-- `src/` — исходники модулей (`vxp-main`, `bg`, `fx`, `room`) и `vxp-denoise.src.js`
+- `src/vxp-main/` — основной модуль, разделённый на смысловые фрагменты; их явный порядок склейки задан в `scripts/build-main.js`
+- `src/vxp-lobby.js`, `vxp-lobby.css` — расширение лобби; `vxp-lobby-sandbox.html` — полностью локальный макет выбора мода для правки CSS без подключения к Voxalike
 - `src/models/*.wasm` — модели шумоподавления (gtcrn, RNNoise); в `vxp-denoise.js` вставляются как base64 при сборке
 - `extension/` — manifest, popup, иконки
+- `scripts/build-main.js` — сборка единого `vxp-main.js` из фрагментов
 - `scripts/embed-models.js` — подстановка моделей в денойзер
 
 Сборка: `./build.sh` (нужен Node.js и zip). Результат:
@@ -14,4 +16,5 @@
 
 При добавлении нового модуля впиши его в `content_scripts[0].js` в `extension/manifest.json` и в цикл копирования в `build.sh` — Firefox-манифест и юзерскрипт подхватят его сами.
 
-Правишь код в `src/`, не в `extension-build/` — её каждый раз пересоздаёт сборка.
+
+Для правки сетки выбора мода откройте `src/vxp-lobby-sandbox.html` в браузере. Макет подключает рядом лежащий `vxp-lobby.css`, не выполняет JavaScript и не обращается к Voxalike; после изменения CSS достаточно обновить страницу.

@@ -8,6 +8,8 @@ const [dir, out] = process.argv.slice(2);
 if (!dir || !out) { console.error('Укажите папку сборки и выходной файл'); process.exit(1); }
 const m = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
 const files = m.content_scripts[0].js;
+const cssFiles = m.content_scripts[0].css || [];
+const css = cssFiles.map((f) => fs.readFileSync(path.join(dir, f), 'utf8').replace(/\s+$/, '')).join('\n');
 const code = files.map((f) => fs.readFileSync(path.join(dir, f), 'utf8').replace(/\s+$/, '')).join('\n;\n') + '\n';
 const head = `// ==UserScript==
 // @name         Voxalike+OrdaxEd
@@ -22,6 +24,13 @@ const head = `// ==UserScript==
 // ==/UserScript==
 `;
 const body = `(function () {
+  var css = ${JSON.stringify(css)};
+  if (css) {
+    var style = document.createElement("style");
+    style.id = "vxp-lobby-style";
+    style.textContent = css;
+    (document.head || document.documentElement).appendChild(style);
+  }
   var code = ${JSON.stringify(code)};
   var s = document.createElement("script");
   s.textContent = code;
