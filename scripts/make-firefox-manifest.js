@@ -9,7 +9,7 @@ const m = JSON.parse(fs.readFileSync(src, 'utf8'));
 delete m.minimum_chrome_version;
 m.browser_specific_settings = {
   gecko: {
-    id: 'voxalike-plus-ordaxed@ordax',          // свой ID, чтобы не конфликтовать с оригиналом
+    id: 'esperion@voxalike-esperion',          // свой ID, чтобы не конфликтовать с оригиналом
     strict_min_version: '128.0',                  // world: "MAIN" в content_scripts — с Firefox 128
     data_collection_permissions: { required: ['none'] },
   },

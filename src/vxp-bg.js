@@ -1,5 +1,5 @@
 /*!
- * Voxalike+OrdaxEd — модуль «Свои фоны» 1.2.3
+ * ESPERION — модуль «Свои фоны» 1.2.3
  * Отдельный файл: подключается к основному моду (vxp-main.js) и работает только вместе с ним.
  * Свои картинки на фон сайта: галерея с предпросмотром, подгонка под экран,
  * затемнение (в том числе по мере прокрутки), прозрачность интерфейса.
@@ -70,7 +70,7 @@
       let ok = 0, bad = 0;
       for (const f of [...files]) {
         if (!(f.type || '').startsWith('image/') && !EXT.test(f.name || '')) { bad++; continue; }
-        try { await addBlob(f, f.name, 'upload'); ok++; } catch (e) { bad++; console.warn('[Voxalike+OrdaxEd] bg add', e); }
+        try { await addBlob(f, f.name, 'upload'); ok++; } catch (e) { bad++; console.warn('[ESPERION] bg add', e); }
       }
       await reload(); renderGrid();
       if (ok) api.toast(tr('Фонов добавлено: ', 'Backgrounds added: ') + ok);
@@ -138,7 +138,7 @@
     const alphaOf = (c) => { const m = /rgba?\(([^)]+)\)/.exec(c || ''); if (!m) return 0; const p = m[1].split(/[ ,\/]+/).filter(Boolean); return p.length > 3 ? parseFloat(p[3]) : 1; };
     const ours = (el) => el.closest && el.closest('#vxp-bg,.vxp-bgui,[class^="vxp-"]');
     let scanT = 0;
-    const scanSoon = () => { if (!scanT) scanT = setTimeout(() => { scanT = 0; try { scan(); } catch (e) { console.warn('[Voxalike+OrdaxEd] bg scan', e); } }, 350); };
+    const scanSoon = () => { if (!scanT) scanT = setTimeout(() => { scanT = 0; try { scan(); } catch (e) { console.warn('[ESPERION] bg scan', e); } }, 350); };
     function scan() {
       const active = st.enabled && !!shownId;
       document.documentElement.style.setProperty('--vxp-bgk', String(1 - st.ui / 100));
@@ -227,7 +227,7 @@
             const f = await ent.getFile(); const fkey = ent.name + '|' + f.size + '|' + f.lastModified; seen.add(fkey);
             if (known.has(fkey)) continue;
             await addBlob(f, ent.name, 'folder', { fkey }); added++;
-          } catch (e) { console.warn('[Voxalike+OrdaxEd] bg folder file', e); }
+          } catch (e) { console.warn('[ESPERION] bg folder file', e); }
         }
         let removed = 0;
         if (!recreated) for (const it of items) if (it.src === 'folder' && !seen.has(it.fkey)) { await dbDel(it.id); freeUrls(it.id); removed++; }
@@ -237,7 +237,7 @@
         else if (!silent) api.toast(tr('Папка: без изменений', 'Folder: no changes'));
         return added;
       } catch (e) {
-        console.warn('[Voxalike+OrdaxEd] bg folder', e);
+        console.warn('[ESPERION] bg folder', e);
         if (!silent) api.toast(tr('Папка недоступна: ', 'Folder unavailable: ') + (e.message || e), 'err');
         return 0;
       } finally { dirBusy = false; }
@@ -248,7 +248,7 @@
         try { base = await window.showDirectoryPicker({ id: 'vxp-bg', mode: 'readwrite', startIn: dirParent || 'documents' }); }
         catch (e) { if (e && e.name === 'TypeError') base = await window.showDirectoryPicker({ mode: 'readwrite' }); else throw e; }
         dirParent = base; dirSelf = base.name === FOLDER;
-        try { await metaPut('dir', base); await metaPut('self', dirSelf); } catch (e) { console.warn('[Voxalike+OrdaxEd] bg dir save', e); }
+        try { await metaPut('dir', base); await metaPut('self', dirSelf); } catch (e) { console.warn('[ESPERION] bg dir save', e); }
         if (!dirSelf) await resolveDir(true);
         await syncDir(true); updateDirUi();
         api.toast(tr('Готово. Складывай картинки в папку «' + FOLDER + '»', 'Done. Put pictures into the “' + FOLDER + '” folder'));
@@ -527,7 +527,7 @@ html:not(.vxp-bgon) .vxp-wkbox{display:none!important}
       });
       const reset = h('button', { type: 'button' }, tr('Сбросить', 'Reset'));
       reset.addEventListener('click', () => { Object.assign(wk, WK_DEF); for (const k in outs) { outs[k][0].value = String(wk[k]); outs[k][1].textContent = wk[k] + '%'; } wkApply(); wkSave(); });
-      return h('div', { class: 'vxp-wkbox' }, h('div', { class: 't' }, h('span', {}, 'ORDAX · ' + tr('Прозрачность', 'Transparency')), reset), ...rows);
+      return h('div', { class: 'vxp-wkbox' }, h('div', { class: 't' }, h('span', {}, 'ESPERION · ' + tr('Прозрачность', 'Transparency')), reset), ...rows);
     };
     // боковая колонка: поднимаемся от списка «Язык/Роли» вверх, пока рядом нет картинок плиток и строки поиска
     const wkSide = (browser) => {
@@ -566,7 +566,7 @@ html:not(.vxp-bgon) .vxp-wkbox{display:none!important}
     /* ---------- запуск ---------- */
     window.__VXP__.bg = { version: VERSION, addFiles, open: openDrawer, items: () => items.map((x) => ({ id: x.id, name: x.name, w: x.w, h: x.h, src: x.src })), select, state: st, rescan: scan, syncDir, debug: () => document.elementsFromPoint(innerWidth / 2, innerHeight / 2).slice(0, 8).map((e) => { const c = getComputedStyle(e); return e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (e.className && typeof e.className === 'string' ? '.' + e.className.trim().split(/\s+/).slice(0, 3).join('.') : '') + ' | bg=' + c.backgroundColor + ' img=' + (c.backgroundImage || '').slice(0, 40) + ' pos=' + c.position + ' z=' + c.zIndex; }) };
     (async () => {
-      try { await reload(); await loadDir(); } catch (e) { console.warn('[Voxalike+OrdaxEd] bg db', e); return; }
+      try { await reload(); await loadDir(); } catch (e) { console.warn('[ESPERION] bg db', e); return; }
       if (dirParent) setTimeout(autoSync, 1500);
       const go = () => { ensureRoot(); apply(); applyShade(); };
       if (document.body) go(); else document.addEventListener('DOMContentLoaded', go, { once: true });

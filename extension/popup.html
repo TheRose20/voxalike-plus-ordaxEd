@@ -2,57 +2,170 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<title>Voxalike+ordaxEd</title>
-<style>
-  body{margin:0;width:300px;background:#0a0f19;color:#f7f7ff;font:14px/1.4 "Nunito Variable","Segoe UI",system-ui,sans-serif}
-  .wrap{padding:14px;display:grid;gap:10px}
-  h1{margin:0;font-size:16px;font-weight:900;display:flex;align-items:center;gap:8px}
-  h1 img{width:24px;height:24px}
-  small{color:#e89543;font-weight:900;letter-spacing:.05em;text-transform:uppercase;font-size:10px}
-  ul{margin:0;padding-left:18px;color:rgba(247,247,255,.8);font-size:12px}
-  li{margin:2px 0}
-  a.btn{display:block;text-align:center;text-decoration:none;padding:9px;border-radius:8px;font-weight:900;background:linear-gradient(180deg,#e89543,#e86543);color:#03141a}
-  p{margin:0;font-size:11px;color:rgba(247,247,255,.5)}
-  .links{display:flex;gap:6px;justify-content:space-between}
-  .links a{flex:1;text-align:center;font-size:11px;font-weight:800;color:#e89543;text-decoration:none;padding:6px 4px;border:1px solid rgba(78,231,210,.3);border-radius:6px}
-  .links a:hover{background:rgba(78,231,210,.08)}
-  .upd{display:grid;gap:6px}
-  .upd .row{display:flex;gap:6px}
-  .upd button{flex:1;cursor:pointer;font:800 11px/1.2 inherit;font-family:inherit;color:#f7f7ff;background:rgba(247,247,255,.06);border:1px solid rgba(78,231,210,.3);border-radius:6px;padding:7px 4px}
-  .upd button:hover{background:rgba(78,231,210,.12)}
-  .upd button:disabled{opacity:.5;cursor:default}
-  #updMsg{font-size:11px;color:rgba(247,247,255,.75);min-height:14px}
-  #updMsg a{color:#e89543;font-weight:800}
-  #updMsg.ok{color:#e89543}
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ESPERION</title>
+<link rel="stylesheet" href="popup.css">
 </head>
 <body>
-<div class="wrap">
-  <h1><img src="icons/icon48.png" alt="">Voxalike+ordaxEd<small id="ver">v1.3.0</small></h1>
-  <ul>
-    <li data-i18n="k1">Две дорожки на сцене озвучки и сдвиг своей записи</li>
-    <li data-i18n="k2">Усиление микрофона и индикатор уровня</li>
-    <li data-i18n="k3">«Слушать оригинал» и «слушать себя» при записи</li>
-    <li data-i18n="k4">Запись всех своих реплик заранее с авто-отправкой</li>
-    <li data-i18n="k5">Питч, скорость, громкость, «под водой», эхо, срез низов</li>
-    <li data-i18n="k6">Монтаж: ножницы, перемещение и удаление кусков</li>
-    <li data-i18n="k7">Отсчёт 3-2-1, волна в реальном времени, буфер 5 с</li>
-    <li data-i18n="k8">Уведомление, когда подошёл ваш ход</li>
-  </ul>
-  <a class="btn" data-i18n="k9" href="https://voxalike.com/" target="_blank" rel="noopener">Открыть Voxalike</a>
-  <div class="upd">
-    <div class="row">
-      <button id="btnCheck" type="button" data-i18n="k13">🔄 Проверить обновления</button>
-      <button id="btnReload" type="button" data-i18n="k14">↻ Перезагрузить расширение</button>
+<div class="app">
+  <header class="top">
+    <img class="logo" src="icons/icon48.png" alt="">
+    <div class="ttl">
+      <h1>ESPERION</h1>
+      <small data-i18n="tag">расширение для voxalike.com</small>
     </div>
-    <div id="updMsg" role="status"></div>
+    <span class="ver" id="ver">v3.0.0</span>
+  </header>
+
+  <a class="cta" href="https://voxalike.com/" target="_blank" rel="noopener">
+    <span data-i18n="open">Открыть Voxalike</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h12M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+
+  <div class="shell">
+    <nav class="rail" role="tablist" aria-orientation="vertical">
+      <button role="tab" id="tab-rec" aria-controls="pane-rec" data-tab="rec"><i aria-hidden="true">◉</i><span data-i18n="tRec">Микрофон</span></button>
+      <button role="tab" id="tab-studio" aria-controls="pane-studio" data-tab="studio"><i aria-hidden="true">▤</i><span data-i18n="tStudio">Студия</span></button>
+      <button role="tab" id="tab-new" aria-controls="pane-new" data-tab="new"><i aria-hidden="true">✧</i><span data-i18n="tNew">Новое</span></button>
+      <button role="tab" id="tab-keys" aria-controls="pane-keys" data-tab="keys"><i aria-hidden="true">⌨</i><span data-i18n="tKeys">Клавиши</span></button>
+      <button role="tab" id="tab-look" aria-controls="pane-look" data-tab="look"><i aria-hidden="true">✦</i><span data-i18n="tLook">Вид</span></button>
+      <span class="ind" aria-hidden="true"></span>
+    </nav>
+
+    <main class="stage">
+      <section class="pane" id="pane-rec" role="tabpanel" aria-labelledby="tab-rec">
+        <div class="card meterCard">
+          <div class="mrow">
+            <h2 data-i18n="mic">Проверка микрофона</h2>
+            <span class="state" id="micState" data-i18n="idle">Не запущена</span>
+          </div>
+          <canvas id="scope" width="640" height="120"></canvas>
+          <div class="bar"><i id="lvl"></i><b id="pk"></b></div>
+          <div class="stats">
+            <div><span data-i18n="peak">Пик</span><b id="vPeak">—</b></div>
+            <div><span data-i18n="rms">Громкость</span><b id="vRms">—</b></div>
+            <div><span data-i18n="noise">Шум</span><b id="vNoise">—</b></div>
+            <div><span data-i18n="snr">Чистота</span><b id="vSnr">—</b></div>
+          </div>
+          <select id="dev" aria-label="Microphone"></select>
+          <button class="btn pri" id="btnTest" type="button" data-i18n="test">Проверить микрофон</button>
+          <p class="hint" id="verdict"></p>
+          <ul class="finds" id="finds"></ul>
+          <p class="sub" data-i18n="micNote">Проверка идёт 6 секунд и целиком локальна: звук никуда не отправляется и не сохраняется.</p>
+        </div>
+      </section>
+
+      <section class="pane" id="pane-studio" role="tabpanel" aria-labelledby="tab-studio">
+        <div class="card">
+          <h2 data-i18n="g1">Запись и монтаж</h2>
+          <ul class="feat">
+            <li><b data-i18n="f1h">Запись по фрагментам</b><span data-i18n="f1">Пишите реплику частями, перезаписывайте и закрепляйте любые куски</span></li>
+            <li><b data-i18n="f3h">Дубли и разбивка</b><span data-i18n="f3">До 6 дублей на фрагмент; запись делится на фразы по паузам</span></li>
+            <li><b data-i18n="f2h">Сверка с оригиналом</b><span data-i18n="f2">Сдвиг, темп и громкость относительно оригинала для каждого фрагмента</span></li>
+            <li><b data-i18n="f5h">Надёжная запись</b><span data-i18n="f5">Прогрев микрофона, непрерывная шкала времени, контроль обрыва и полный хвост записи</span></li>
+          </ul>
+          <h2 data-i18n="g2">Звук</h2>
+          <ul class="feat">
+            <li><b data-i18n="f4h">Обработка голоса</b><span data-i18n="f4">EQ, компрессор, дэ-эссер, лимитер, шумовой гейт, де-хам, тепло, выравнивание громкости, нейро-шумодав</span></li>
+            <li><b data-i18n="f7h">Умная настройка</b><span data-i18n="f7">Анализ записи и готовая цепочка под неё</span></li>
+            <li><b data-i18n="f8h">20 пресетов и свои</b><span data-i18n="f8">Сохранить, обновить, переименовать, дублировать, экспорт и импорт</span></li>
+          </ul>
+          <h2 data-i18n="g3">Проверка и выпуск</h2>
+          <ul class="feat">
+            <li><b data-i18n="f12h">Мастер реплики</b><span data-i18n="f12">Разбивка на фразы, подрезка тишины, удаление щелчков и выравнивание громкости одной кнопкой с отчётом</span></li>
+            <li><b data-i18n="f11h">Проверка записи</b><span data-i18n="f11">Перегруз, щелчки, провалы звука, «прыжки» громкости; отметки на дорожке и исправление в один клик</span></li>
+            <li><b data-i18n="f9h">Громкость экспорта (LUFS)</b><span data-i18n="f9">WAV подгоняется к −16 / −18 / −23 LUFS, пик не выше −1 дБ</span></li>
+            <li><b data-i18n="f6h">Оформление</b><span data-i18n="f6">Темы, свой акцент, фон, углы, свечение, плотность и настраиваемые анимации</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="pane" id="pane-new" role="tabpanel" aria-labelledby="tab-new">
+        <div class="card">
+          <div class="rel"><span class="tag">3.0</span><h3 data-i18n="r30">ESPERION: новый облик</h3></div>
+          <ul class="log">
+            <li data-i18n="r30a">Собственная дизайн-система: графитовые слои, мягкое свечение, новые вкладки, переключатели и регуляторы</li>
+            <li data-i18n="r30b">Раздел «Вид» в студии: цвет, фон, углы, свечение, плотность</li>
+            <li data-i18n="r30c">Настраиваемые анимации: интенсивность, скорость, декоративные эффекты, упрощённый режим; системное «уменьшить движение» учитывается</li>
+            <li data-i18n="r30d">Новое окно расширения и новый значок</li>
+          </ul>
+          <div class="rel"><span class="tag">2.9</span><h3 data-i18n="r29">Мастер реплики, чистые стыки</h3></div>
+          <ul class="log">
+            <li data-i18n="r29a">«Мастер реплики» (G): фразы, тишина, щелчки, громкость и повторная проверка одним шагом, отмена Ctrl+Z</li>
+            <li data-i18n="r29b">Исправлен провал звука на стыке после разреза посреди речи</li>
+            <li data-i18n="r29c">«Убрать щелчки» больше не обещает исправить «ступеньки»: они отмечаются отдельно</li>
+          </ul>
+          <div class="rel"><span class="tag">2.8</span><h3 data-i18n="r28">Починка записи</h3></div>
+          <ul class="log">
+            <li data-i18n="r28a">«Убрать щелчки» — неразрушающий де-клик куска, отмена Ctrl+Z</li>
+            <li data-i18n="r28b">«Выровнять громкость» прямо из проверки записи</li>
+          </ul>
+          <div class="rel"><span class="tag">2.7</span><h3 data-i18n="r27">Проверка записи</h3></div>
+          <ul class="log">
+            <li data-i18n="r27a">Кнопка «Проверить запись» (K): перегруз, щелчки, провалы, «прыжки» громкости</li>
+          </ul>
+          <div class="rel"><span class="tag">2.6</span><h3 data-i18n="r26">Диагностика микрофона</h3></div>
+          <ul class="log">
+            <li data-i18n="r26a">Поиск гула сети 50/60 Гц и перегруза, несколько находок сразу</li>
+          </ul>
+          <div class="rel"><span class="tag">2.5</span><h3 data-i18n="r25">Громкость экспорта</h3></div>
+          <ul class="log">
+            <li data-i18n="r25a">Измерение по BS.1770 и подгонка WAV к целевым LUFS</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="pane" id="pane-keys" role="tabpanel" aria-labelledby="tab-keys">
+        <div class="card">
+          <h2 data-i18n="kg1">Запись</h2>
+          <div class="keys">
+            <div><kbd>R</kbd><span data-i18n="k1">запись / стоп</span></div>
+            <div><kbd>Space</kbd><span data-i18n="k7">послушать</span></div>
+            <div><kbd>M</kbd><span data-i18n="k3">метка</span></div>
+            <div><kbd>, .</kbd><span data-i18n="k4">границы фрагментов</span></div>
+            <div><kbd>Enter</kbd><span data-i18n="k13">отправить реплику</span></div>
+          </div>
+          <h2 data-i18n="kg2">Правка</h2>
+          <div class="keys">
+            <div><kbd>E</kbd><span data-i18n="k2">эффекты фрагмента</span></div>
+            <div><kbd>G</kbd><span data-i18n="k15">мастер реплики</span></div>
+            <div><kbd>P</kbd><span data-i18n="k9">разбить на фразы</span></div>
+            <div><kbd>T</kbd><span data-i18n="k6">подрезать тишину</span></div>
+            <div><kbd>B</kbd><span data-i18n="k5">выровнять громкость</span></div>
+            <div><kbd>A</kbd><span data-i18n="k11">автоподгонка под оригинал</span></div>
+            <div><kbd>[ ]</kbd><span data-i18n="k12">сдвиг дорожки (Shift — крупнее)</span></div>
+            <div><kbd>Ctrl Z</kbd><span data-i18n="k10">отмена</span></div>
+          </div>
+          <h2 data-i18n="kg3">Проверка</h2>
+          <div class="keys">
+            <div><kbd>K</kbd><span data-i18n="k14">проверить запись</span></div>
+            <div><kbd>H</kbd><span data-i18n="k8">все клавиши</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="pane" id="pane-look" role="tabpanel" aria-labelledby="tab-look">
+        <div class="card">
+          <h2 data-i18n="lkAcc">Акцент</h2>
+          <div class="sw" id="swatches" role="radiogroup" aria-label="Accent"></div>
+          <label class="row2"><span data-i18n="lkCustom">Свой цвет</span><input type="color" id="accPick" value="#8b5cf6"></label>
+          <h2 data-i18n="lkFx">Свечение и движение</h2>
+          <label class="row2"><span data-i18n="lkGlow">Свечение</span><span class="rg"><input type="range" id="glow" min="0" max="100" step="5"><output id="glowV">60%</output></span></label>
+          <label class="row2 tg"><span data-i18n="lkAnim">Анимации</span><input type="checkbox" id="anim"></label>
+          <label class="row2 tg"><span data-i18n="lkLite">Упрощённый режим</span><input type="checkbox" id="lite"></label>
+          <button class="btn" id="lookReset" type="button" data-i18n="lkReset">Сбросить оформление</button>
+          <p class="sub" data-i18n="lkNote">Это оформление окна расширения. Оформление студии на сайте настраивается в самой студии, вкладка «Вид».</p>
+        </div>
+      </section>
+    </main>
   </div>
-  <div class="links">
-    <a data-i18n="k10" href="https://github.com/TheRose20/voxalike-plus-ordaxEd/issues/new/choose" target="_blank" rel="noopener">💡 Идея / ошибка</a>
-    <a href="https://github.com/TheRose20/voxalike-plus-ordaxEd" target="_blank" rel="noopener">GitHub</a>
-    <a data-i18n="k11" href="https://boosty.to/el_beshuele/donate" target="_blank" rel="noopener" title="Boosty оригинального автора Voxalike+">❤️ Поддержать</a>
+
+  <div class="foot">
+    <button class="btn" id="btnReload" type="button" data-i18n="reload">Перезагрузить расширение</button>
+    <a class="btn" id="lic" href="NOTICE.md" target="_blank" rel="noopener" data-i18n="lic">Лицензии</a>
   </div>
-  <p data-i18n="k12">Неофициальный мод: работает поверх voxalike.com на оригинальных серверах, не связан с разработчиками игры. Предоставляется «как есть», без гарантий — используйте на свой риск.</p>
+  <div id="msg" role="status"></div>
+  <p class="disc" data-i18n="disc">Неофициальное расширение: работает поверх voxalike.com на оригинальных серверах и не связано с разработчиками сайта. Предоставляется «как есть», без гарантий.</p>
 </div>
 <script src="popup.js"></script>
 </body>

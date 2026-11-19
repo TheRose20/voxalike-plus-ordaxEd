@@ -1,5 +1,5 @@
 /*!
- * Voxalike+OrdaxEd — модуль «Эффектор» 1.1.0
+ * ESPERION — модуль «Эффектор» 1.1.0
  * Отдельный файл: подключается к основному моду (vxp-main.js) и работает только вместе с ним.
  * Голосовой эффектор для записанной дорожки: питч и формант по отдельности, слои (суб-октава, гармонайзер, хор),
  * шёпот, робот, кольцевая модуляция, рычание, дисторшн, цифровой хруст, тембр. Пресеты: демон, дракон, веном, робот и другие,
@@ -254,26 +254,26 @@
 
   /* ---------------- интерфейс: студия эффектора ---------------- */
   const CSS = `
-.vfx-card{width:min(880px,97vw);max-height:94vh;overflow:auto;border-radius:20px;border:1px solid rgba(var(--va3,255,90,0),.35);background:radial-gradient(120% 90% at 50% 0%,#1b1d26 0%,#0d0e13 62%,#08090c 100%);box-shadow:0 30px 90px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.06);color:#eceff6;padding:16px 18px 14px;display:grid;gap:14px;position:relative}
+.vfx-card{width:min(880px,97vw);max-height:94vh;overflow:auto;border-radius:20px;border:1px solid rgba(var(--va3,139,92,246),.35);background:radial-gradient(120% 90% at 50% 0%,#1b1d26 0%,#0d0e13 62%,#08090c 100%);box-shadow:0 30px 90px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.06);color:#eceff6;padding:16px 18px 14px;display:grid;gap:14px;position:relative}
 .vfx-top{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding-right:30px}
-.vfx-title{font:950 13px/1 inherit;letter-spacing:.2em;color:var(--va,#ff5a00);text-transform:uppercase;white-space:nowrap}
+.vfx-title{font:950 13px/1 inherit;letter-spacing:.2em;color:var(--va,#8b5cf6);text-transform:uppercase;white-space:nowrap}
 .vfx-title small{display:block;margin-top:5px;font:700 10px/1 inherit;letter-spacing:.12em;color:#8a90a2}
 .vfx-pre{display:flex;align-items:center;justify-content:center;gap:8px;min-width:0}
 .vfx-pre button.arrow{width:34px;height:34px;border-radius:50%;border:1px solid #2c3040;background:linear-gradient(#22252f,#14161c);color:#cfd3e0;font-size:13px;cursor:pointer}
-.vfx-pre button.arrow:hover{border-color:var(--va,#ff5a00);color:#fff}
+.vfx-pre button.arrow:hover{border-color:var(--va,#8b5cf6);color:#fff}
 .vfx-name{flex:1;max-width:340px;height:38px;border-radius:12px;border:1px solid #2b2f3d;background:#0a0b0f;box-shadow:inset 0 2px 8px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;gap:8px;font:900 15px/1 inherit;letter-spacing:.04em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 12px}
 .vfx-name.off{color:#6d7284}
 .vfx-name i{font-style:normal;cursor:pointer;color:#8a90a2;font-size:12px}
 .vfx-name i:hover{color:#ff6b6b}
 .vfx-pwr{width:44px;height:44px;border-radius:50%;border:1px solid #2c3040;background:linear-gradient(#22252f,#14161c);color:#6d7284;font-size:20px;cursor:pointer;display:grid;place-items:center}
-.vfx-pwr.on{color:#fff;border-color:var(--va,#ff5a00);background:radial-gradient(circle at 50% 35%,var(--va,#ff5a00),#9a3400);box-shadow:0 0 18px rgba(var(--va3,255,90,0),.55)}
+.vfx-pwr.on{color:#fff;border-color:var(--va,#8b5cf6);background:radial-gradient(circle at 50% 35%,var(--va,#8b5cf6),#4a2a96);box-shadow:0 0 18px rgba(var(--va3,139,92,246),.55)}
 .vfx-body{display:grid;grid-template-columns:1fr 92px;gap:14px;align-items:stretch}
 .vfx-field{display:grid;gap:10px}
 .vfx-row{display:flex;justify-content:space-around;align-items:flex-end;gap:6px;flex-wrap:wrap}
 .vfx-knob{position:relative;display:grid;justify-items:center;gap:2px;user-select:none;touch-action:none;cursor:ns-resize}
 .vfx-knob svg{display:block;overflow:visible}
 .vfx-knob .tr{fill:none;stroke:#252835;stroke-width:5;stroke-linecap:round}
-.vfx-knob .vl{fill:none;stroke:var(--va,#ff5a00);stroke-width:5;stroke-linecap:round;filter:drop-shadow(0 0 4px rgba(var(--va3,255,90,0),.8))}
+.vfx-knob .vl{fill:none;stroke:var(--va,#8b5cf6);stroke-width:5;stroke-linecap:round;filter:drop-shadow(0 0 4px rgba(var(--va3,139,92,246),.8))}
 .vfx-knob .pt{stroke:#fff;stroke-width:3;stroke-linecap:round}
 .vfx-knob .bd{stroke:#343949;stroke-width:1.5}
 .vfx-knob .vv{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font:900 12px/1 inherit;color:#e8ebf4;pointer-events:none;text-shadow:0 1px 3px #000;margin-top:7px}
@@ -283,18 +283,18 @@
 .vfx-knob.k-sm .vv{font-size:10.5px}.vfx-knob.k-big .vv{font-size:14px}
 .vfx-int{display:flex;gap:4px;justify-content:center;margin-top:2px}
 .vfx-int button{padding:3px 7px;border-radius:7px;border:1px solid #2c3040;background:#14161c;color:#99a0b3;font:800 10px/1 inherit;cursor:pointer}
-.vfx-int button.on{background:var(--va,#ff5a00);border-color:var(--va,#ff5a00);color:#fff}
+.vfx-int button.on{background:var(--va,#8b5cf6);border-color:var(--va,#8b5cf6);color:#fff}
 .vfx-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .vfx-slot{border:1px solid #232634;border-radius:14px;background:linear-gradient(#10121a,#0a0b10);padding:8px 6px 8px;display:grid;gap:4px;justify-items:center}
 .vfx-slot header{display:flex;align-items:center;gap:7px;font:900 11px/1 inherit;letter-spacing:.14em;color:#b7bdce;text-transform:uppercase;cursor:pointer}
 .vfx-led{width:10px;height:10px;border-radius:50%;background:#2a2d3a;box-shadow:inset 0 1px 2px #000}
-.vfx-slot.on .vfx-led{background:var(--va,#ff5a00);box-shadow:0 0 9px var(--va,#ff5a00)}
+.vfx-slot.on .vfx-led{background:var(--va,#8b5cf6);box-shadow:0 0 9px var(--va,#8b5cf6)}
 .vfx-slot.on header{color:#fff}
 .vfx-slot .vfx-row{justify-content:center;gap:2px}
 .vfx-side{display:grid;grid-template-rows:1fr auto;gap:8px;justify-items:center}
 .vfx-wet{display:grid;gap:6px;justify-items:center;align-content:center}
 .vfx-bar{position:relative;width:34px;height:210px;border-radius:9px;border:1px solid #2b2f3d;background:#08090c;box-shadow:inset 0 2px 8px rgba(0,0,0,.7);cursor:ns-resize;overflow:hidden;touch-action:none}
-.vfx-bar i{position:absolute;left:0;right:0;bottom:0;background:repeating-linear-gradient(to top,var(--va,#ff5a00) 0 7px,transparent 7px 10px);box-shadow:0 0 16px rgba(var(--va3,255,90,0),.5)}
+.vfx-bar i{position:absolute;left:0;right:0;bottom:0;background:repeating-linear-gradient(to top,var(--va,#8b5cf6) 0 7px,transparent 7px 10px);box-shadow:0 0 16px rgba(var(--va3,139,92,246),.5)}
 .vfx-wet b{font:900 12px/1 inherit}.vfx-wet span{font:900 10px/1 inherit;letter-spacing:.16em;color:#99a0b3}
 .vfx-foot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:space-between;border-top:1px solid #20232f;padding-top:10px}
 .vfx-foot .grp{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
@@ -413,7 +413,7 @@
       nameEl = h('div', { class: 'vfx-name' });
       pwrEl = h('button', { class: 'vfx-pwr', type: 'button', title: tr('Включить / выключить эффектор', 'Effector on/off'), onclick: () => { patch({ on: !cur().on }, true); syncPreset(); } }, '⏻');
       const top = h('div', { class: 'vfx-top' },
-        h('div', { class: 'vfx-title' }, '🎭 ' + tr('Эффектор голоса', 'Voice effector'), h('small', null, 'ORDAX FX')),
+        h('div', { class: 'vfx-title' }, '🎭 ' + tr('Эффектор голоса', 'Voice effector'), h('small', null, 'ESPERION FX')),
         h('div', { class: 'vfx-pre' }, h('button', { class: 'arrow', type: 'button', title: tr('Предыдущий пресет', 'Previous preset'), onclick: () => step(-1) }, '◀'), nameEl, h('button', { class: 'arrow', type: 'button', title: tr('Следующий пресет', 'Next preset'), onclick: () => step(1) }, '▶')),
         pwrEl);
 

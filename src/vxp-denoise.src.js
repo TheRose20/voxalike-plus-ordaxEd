@@ -1,5 +1,5 @@
 /*!
- * Voxalike+OrdaxEd — модуль «Нейросетевой шумодав» 1.0.0
+ * ESPERION — модуль «Нейросетевой шумодав» 1.0.0
  * Отдельный файл: подключается к основному моду (vxp-main.js) и работает только вместе с ним.
  * Две нейросети внутри файла (ничего скачивать не нужно):
  *   • GTCRN  — сильная, хорошо убирает клавиатуру, мышку и «живой» шум.  MIT, © 2024 Rong Xiaobin
@@ -96,7 +96,7 @@
       status[name] = 'loading';
       loading[name] = (name === 'gtcrn' ? NNCORE.loadGtcrn : NNCORE.loadRnnoise)(dec(B64[name]))
         .then((e) => { engines[name] = e; status[name] = 'ready'; try { api.emit && api.emit('nn'); } catch {} return e; })
-        .catch((er) => { status[name] = 'error: ' + (er && er.message || er); console.warn('[Voxalike+OrdaxEd] нейросеть ' + name, er); });
+        .catch((er) => { status[name] = 'error: ' + (er && er.message || er); console.warn('[ESPERION] нейросеть ' + name, er); });
       return loading[name];
     };
     /** Нейросетевой шумодав дорожки: strength 0..1 — доля очищенного звука в итоге. */

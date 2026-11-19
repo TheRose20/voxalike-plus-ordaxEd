@@ -1,0 +1,13 @@
+const { method } = require('./lib.js');
+let fail = 0; const ok = (c, msg) => { console.log((c ? 'PASS ' : 'FAIL ') + msg); if (!c) fail++; };
+const names = ['snapshot', 'pushHist', 'dropHist', '_restore', 'undo', 'redo'];
+const cls = new Function('clamp', 'ensureSegs', 'return class E { constructor(){ this.hist=[]; this.redoStack=[]; this.sel=new Set(); this.model={segs:[{id:1,pos:0}],params:{offset:0},frags:[]}; this.commits=[]; } commit(k){this.commits.push(k);} ' + names.map(method).join('\n') + ' }')((v)=>v, (m)=>m.segs);
+const e = new cls(); const val = () => e.model.segs.map((s) => s.pos).join(',');
+e.pushHist(); e.model.segs = [{ id: 1, pos: 1 }];
+e.pushHist(); e.model.segs = [{ id: 1, pos: 2 }];
+e.undo(); ok(val() === '1', 'undo → 1'); e.undo(); ok(val() === '0', 'undo → 0');
+e.redo(); ok(val() === '1', 'redo → 1'); e.redo(); ok(val() === '2', 'redo → 2');
+e.redo(); ok(val() === '2', 'redo на пустом стеке ничего не ломает');
+e.undo(); e.pushHist(); e.dropHist(); ok(e.redoStack.length === 1, 'пустое действие (dropHist) не стирает Redo');
+e.pushHist(); e.model.segs = [{ id: 1, pos: 9 }]; ok(e.redoStack.length === 0, 'новое действие очищает Redo');
+console.log(fail ? 'ИТОГ: провалов ' + fail : 'ИТОГ: всё прошло'); process.exit(fail ? 1 : 0);
