@@ -24,7 +24,7 @@
 (() => {
   'use strict';
   if (window.__VXP__) return;
-  const VERSION = '1.41.1';
+  const VERSION = '1.41.2';
   const VXP = (window.__VXP__ = { version: VERSION });
   const IS_FF = /firefox/i.test(navigator.userAgent);
 

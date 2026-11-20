@@ -298,27 +298,37 @@
       const pack = room && room.status === 'lobby' && room.lobbyPack;
       installPackPicker();
       installSettingsCapture();
-      for (const old of qsa('.vxp-lobby-info')) old.remove();
-      if (!pack) return;
-      const hosts = qsa('.selected-pack-card');
-      if (!hosts.length) return;
-      const token = text(pack.packId) + '|' + text(pack.workshopPackId) + '|' + text(pack.workshopPackSlug);
-      for (const host of hosts) {
-        const loading = infoCard(pack, null, null);
-        loading.setAttribute('data-vxp-pack-token', token);
-        host.append(loading);
+      if (!pack) {
+        for (const old of qsa('.vxp-lobby-info')) old.remove();
+        return;
       }
-      lookup(pack).then((detail) => {
-        for (const host of qsa('.selected-pack-card')) {
-          const old = host.querySelector('.vxp-lobby-info[data-vxp-pack-token="' + CSS.escape(token) + '"]');
-          if (old) old.replaceWith(infoCard(pack, detail, null));
+      const hosts = qsa('.selected-pack-card');
+      const signature = JSON.stringify(pack);
+      const pending = [];
+      for (const host of hosts) {
+        const old = host.querySelector('.vxp-lobby-info');
+        if (old && old._vxpPackSignature === signature) continue;
+        const loading = infoCard(pack, null, null);
+        loading._vxpPackSignature = signature;
+        if (old) old.replaceWith(loading);
+        else host.append(loading);
+        pending.push({ host, card: loading });
+      }
+      if (!pending.length) return;
+      // Обновляем только карточки этого запроса, не затрагивая уже выбранный другой мод.
+      const update = (detail, lineCounts) => {
+        for (const entry of pending) {
+          if (!entry.host.isConnected || entry.card.parentElement !== entry.host) continue;
+          const next = infoCard(pack, detail, lineCounts);
+          next._vxpPackSignature = signature;
+          entry.card.replaceWith(next);
+          entry.card = next;
         }
+      };
+      lookup(pack).then((detail) => {
+        update(detail, null);
         loadLineCounts(pack, detail).then((lineCounts) => {
-          if (!lineCounts) return;
-          for (const host of qsa('.selected-pack-card')) {
-            const old = host.querySelector('.vxp-lobby-info[data-pack-id="' + CSS.escape(text(pack.packId)) + '"]');
-            if (old) old.replaceWith(infoCard(pack, detail, lineCounts));
-          }
+          if (lineCounts) update(detail, lineCounts);
         });
       });
     }
